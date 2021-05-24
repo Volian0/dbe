@@ -17,6 +17,8 @@ public:
 
 	void swap_buffers();
 
+	void event_update() const;
+
 private:
 	GLFWwindow* ptr;
 };

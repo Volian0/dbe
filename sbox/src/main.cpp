@@ -1,6 +1,25 @@
 #include <engine.hpp>
 
+class Sandbox : public Application {
+public:
+	void on_init() override {
+
+	}
+
+	void on_update() override {
+
+	}
+
+	void on_destroy() override {
+
+	}
+};
+
 int main() {
-	print_hello();
-	test_window_loop();
+	Sandbox sbox;
+	sbox.run({
+		640, 480,
+		"Sandbox",
+		false
+	});
 }

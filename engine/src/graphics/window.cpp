@@ -36,6 +36,10 @@ Window::~Window()
 	glfwTerminate();
 }
 
+void Window::event_update() const {
+	glfwPollEvents();
+}
+
 bool Window::should_close() const
 {
 	return glfwWindowShouldClose(ptr);

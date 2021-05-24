@@ -12,6 +12,8 @@ project "sbox"
 	}
 
 	includedirs {
+		"../extern/glfw/include",
+		"../extern/glad/include",
 		"../engine/src"
 	}
 
