@@ -17,7 +17,7 @@ engine_system_deps_unix = {
 project "engine"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++11"
+	cppdialect "C++17"
 
 	targetdir "bin"
 	objdir "obj"
@@ -28,8 +28,9 @@ project "engine"
 	}
 
 	includedirs {
+		"src",
 		"../extern/glfw/include",
-		"../extern/glad/include",
+		"../extern/glad/include"
 	}
 
 	filter "configurations:debug"
