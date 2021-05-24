@@ -1,5 +1,9 @@
 # Dragon Ball Earth fan game
 
+Read `STYLEGUIDE.txt` before you submit a pull request.
+Also make sure you add any generated IDE files to
+`.gitignore`.
+
 ## Building
  - Install [Premake5](https://premake.github.io/)
 
