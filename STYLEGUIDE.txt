@@ -1,0 +1,25 @@
+-- Coding Style Guide --
+Please read and make sure you follow the following guidelines
+before you submit a pull request
+
+1. Use capitalized CamelCase for type names, and snake_case
+for everything else.
+
+2. Use actual tabs instead of spaces, this way programmers
+can choose what tab size they want. Make sure your text
+editor is set to use `hard tabs' instead of `soft tabs'.
+
+3. Use ISO C++ 17 - super modern C++ features are often
+unstable and can cause mess.
+
+4. Use the file extension `.hpp' for C++ headers, `.h' for
+C headers. Use `.cpp' for C++ source files, `.c' for C source.
+This will make it easy to distinguish between C and C++, from
+looking at the file names.
+
+5. Avoid the use of `try'/`catch' blocks, as they have a large
+performance penalty. `throw' is okay to use for unrecoverable
+errors.
+
+6. Don't use `using namespace std;'. It clutters the global
+namespace, and is generally bad practice.
