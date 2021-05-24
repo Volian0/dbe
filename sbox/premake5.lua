@@ -31,10 +31,12 @@ project "sbox"
 
 	filter "system:linux"
 		links {
+			engine_deps,
 			engine_system_deps_unix
 		}
 
 	filter "system:windows"
 		links {
+			engine_deps,
 			engine_system_deps_windows
 		}
