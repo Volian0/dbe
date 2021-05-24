@@ -1,4 +1,6 @@
-# Dragon Ball Earth fan game
+# Dragon Ball Earth
+
+### Dragon Ball fan game
 
 Read `STYLEGUIDE.txt` before you submit a pull request.
 Also make sure you add any generated IDE files to
