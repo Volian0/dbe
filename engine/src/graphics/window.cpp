@@ -6,6 +6,11 @@
 
 static void gl_debug_callback(u32 source, u32 type, u32 id,
 	u32 severity, i32 length, const char* message, const void* up) {
+
+	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) {
+		return;
+	}
+
 	const char* s;
 	const char* t;
 	LogSeverity se;
