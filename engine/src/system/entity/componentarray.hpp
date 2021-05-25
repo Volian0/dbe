@@ -25,7 +25,7 @@ private:
 	u32 m_size;
 public:
 	void insert(EntityHandle entity, T component) {
-		if (m_entity_to_index.find(entity) == m_index_to_entity.end()) {
+		if (m_entity_to_index.find(entity) != m_index_to_entity.end()) {
 			log(LOG_WARNING, "Attempting to add the same\
 				component to an entity twice");
 			return;
@@ -38,7 +38,7 @@ public:
 	}
 
 	void remove(EntityHandle entity) {
-		if (m_entity_to_index.find(entity) != m_entity_to_index.end()) {
+		if (m_entity_to_index.find(entity) == m_entity_to_index.end()) {
 			log(LOG_WARNING, "Attempting to remove a non-existant component");
 			return;
 		}

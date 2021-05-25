@@ -32,8 +32,10 @@ public:
 	void register_component() {
 		const char* type_name = typeid(T).name();
 
-		assert(m_component_types.find(type_name) == m_component_types.end() &&
-			"Component already registered");
+		if (m_component_types.find(type_name) != m_component_types.end()) {
+			log(LOG_WARNING, "Component already registered");
+			return;
+		}
 
 		m_component_types.insert({type_name, m_next_type});
 		m_component_arrays.insert({type_name, std::make_shared <ComponentArray <T>>()});
@@ -45,14 +47,16 @@ public:
 	ComponentType get_component_type() {
 		const char* type_name = typeid(T).name();
 
-		assert(m_component_types.find(type_name) != m_component_types.end()
-			&& "Component not registered.");
+		if (m_component_types.find(type_name) == m_component_types.end()) {
+			log(LOG_WARNING, "Component not registered");
+			register_component<T>();
+		}
 
 		return m_component_types[type_name];
 	}
 
 	template <typename T>
-	void add_component(EntityHandle entity, T component) {
+	void add_component(EntityHandle entity, const T& component) {
 		get_component_array<T>()->insert(entity, component);
 	}
 
@@ -63,7 +67,7 @@ public:
 
 	template <typename T>
 	T& get_component(EntityHandle entity) {
-		return get_component<T>()->get(entity);
+		return get_component_array<T>()->get(entity);
 	}
 
 	void on_entity_destroy(EntityHandle entity);
