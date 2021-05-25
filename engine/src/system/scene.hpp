@@ -38,6 +38,11 @@ struct Entity {
 	}
 
 	template <typename T>
+	void remove_component() {
+		scene->ecs.remove_component<T>(handle);
+	}
+
+	template <typename T>
 	bool has_component() {
 		assert(scene != nullptr);
 
