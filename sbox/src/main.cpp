@@ -26,29 +26,29 @@ public:
 
 class Sandbox : public Application {
 private:
-	ECS ecs;
+	Scene scene;
 
 	std::shared_ptr<TestSystem> ts;
 public:
 	void on_init() override {
-		ecs.register_component<TestComponent>();
-		ecs.register_component<AnotherTestComponent>();
+		scene.ecs.register_component<TestComponent>();
+		scene.ecs.register_component<AnotherTestComponent>();
 
 		{
-			ts = ecs.register_system<TestSystem>();
+			ts = scene.ecs.register_system<TestSystem>();
 			Signature sig;
-			sig.set(ecs.get_component_type<TestComponent>());
-			sig.set(ecs.get_component_type<AnotherTestComponent>());
-			ecs.set_system_signature<TestSystem>(sig);
+			sig.set(scene.ecs.get_component_type<TestComponent>());
+			sig.set(scene.ecs.get_component_type<AnotherTestComponent>());
+			scene.ecs.set_system_signature<TestSystem>(sig);
 		}
 
-		EntityHandle e = ecs.new_entity();
-		ecs.add_component<TestComponent>(e, {0.3, 4.0, 3.0});
-		ecs.add_component<AnotherTestComponent>(e, {"Hello, world"});
+		Entity e = scene.new_entity();
+		e.add_component<TestComponent>({0.3, 4.0, 3.0});
+		e.add_component<AnotherTestComponent>({"Hello, world"});
 	}
 
 	void on_update() override {
-		ts->update(ecs, m_window->timestep);
+		ts->update(scene.ecs, m_window->timestep);
 	}
 
 	void on_destroy() override {

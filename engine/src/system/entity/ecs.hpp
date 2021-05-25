@@ -50,6 +50,12 @@ public:
 	}
 
 	template <typename T>
+	bool has_component(EntityHandle entity) {
+		return m_entity_manager->get_signature(entity).
+			test(m_component_manager->get_component_type<T>());
+	}
+
+	template <typename T>
 	ComponentType get_component_type() {
 		return m_component_manager->get_component_type<T>();
 	}
