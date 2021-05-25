@@ -9,10 +9,10 @@ class Scene {
 private:
 	ECS m_ecs;
 
-	std::shared_ptr <Renderer> m_renderer;
-
 	friend class Entity;
 public:
+	std::shared_ptr <Renderer> m_renderer;
+
 	Scene();
 
 	Entity new_entity();

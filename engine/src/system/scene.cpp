@@ -1,5 +1,4 @@
 #include "scene.hpp"
-#include "graphics/shader.hpp"
 
 Entity::Entity() {
 
