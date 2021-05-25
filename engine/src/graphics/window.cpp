@@ -47,5 +47,9 @@ bool Window::should_close() const
 
 void Window::swap_buffers()
 {
+	now_time = glfwGetTime();
+	timestep = now_time - last_time;
+	last_time = now_time;
+
 	glfwSwapBuffers(ptr);
 }

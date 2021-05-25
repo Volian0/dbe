@@ -12,11 +12,12 @@ struct AnotherTestComponent {
 
 class TestSystem : public System {
 public:
-	void update(ECS& ecs) {
+	void update(ECS& ecs, double timestep) {
 		for (const auto& entity : m_entities) {
 			auto& tc = ecs.get_component<TestComponent>(entity);
 			auto& atc = ecs.get_component<AnotherTestComponent>(entity);
 
+			printf("timestep: %g\n", timestep);
 			printf("TC: %g, %g, %g\n", tc.x, tc.y, tc.z);
 			printf("ATC: %s\n", atc.a.c_str());
 		}
@@ -47,7 +48,7 @@ public:
 	}
 
 	void on_update() override {
-		//ts->update(ecs);
+		ts->update(ecs, m_window->timestep);
 	}
 
 	void on_destroy() override {

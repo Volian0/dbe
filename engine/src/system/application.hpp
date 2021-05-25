@@ -7,7 +7,7 @@
 #include "graphics/window.hpp"
 
 class Application {
-private:
+protected:
 	std::shared_ptr<Window> m_window;
 public:
 	struct Config {
