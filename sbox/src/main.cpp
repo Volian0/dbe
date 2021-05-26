@@ -6,15 +6,13 @@ private:
 
 	double m_next_reload { 1.0 };
 
-	mat4 m_projection;
-
 	Entity sphere_entity;
 public:
 	void on_init() override {
 		m_scene.m_renderer->new_shader("test shader",
 			ResourceManager::load_string("shaders/test.glsl"));
 
-		auto sphere_entity = m_scene.new_entity();
+		sphere_entity = m_scene.new_entity();
 		sphere_entity.add_component<Transform>({
 			{0.0, 0.0, -3.0}, /* translation */
 			{0.0, 0.0, 0.0}, /* rotation */
