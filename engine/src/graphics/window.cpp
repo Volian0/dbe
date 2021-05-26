@@ -49,11 +49,17 @@ static void APIENTRY gl_debug_callback(u32 source, u32 type, u32 id,
 	log(se, "OpenGL (source: %s; type: %s): %s", s, t, message);
 }
 
-static void window_resize_callback(GLFWwindow* window, i32 width, i32 height) {
+static void window_resize_callback(GLFWwindow* ptr, i32 width, i32 height) {
+	Window* window = (Window*)glfwGetWindowUserPointer(ptr);
+
 	glViewport(0, 0, width, height);
+
+	window->width = width;
+	window->height = height;
 }
 
 Window::Window(unsigned width, unsigned height, const std::string& title, bool fullscreen)
+	: width(width), height(height)
 {
 	//make sure to init GLFW
 	if (!glfwInit())
@@ -80,6 +86,8 @@ Window::Window(unsigned width, unsigned height, const std::string& title, bool f
 		glfwTerminate();
 		throw std::runtime_error("Failed to init GLAD!");
 	}
+
+	glfwSetWindowUserPointer(ptr, this);
 
 	glfwSetFramebufferSizeCallback(ptr, window_resize_callback);
 

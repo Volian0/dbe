@@ -5,6 +5,8 @@ private:
 	Scene m_scene;
 
 	double m_next_reload { 1.0 };
+
+	mat4 m_projection;
 public:
 	void on_init() override {
 		m_scene.m_renderer->new_shader("test shader",
@@ -16,6 +18,19 @@ public:
 	}
 
 	void on_update() override {
+		m_projection = mat4::persp(75.0,
+			(float)m_window->width/(float)m_window->height,
+			0.1, 100.0);
+
+		mat4 transform = mat4::translate({0.0, 0.0, -3.0});
+
+		/* TODO: Projection should be part of the renderer */
+		/* TODO: Transform should have it's own component */
+		Shader s = m_scene.m_renderer->get_shader("test shader");
+		m_scene.m_renderer->bind_shader(s);
+		m_scene.m_renderer->set_shader_uniform_mat4(s, "projection", m_projection);
+		m_scene.m_renderer->set_shader_uniform_mat4(s, "transform", transform);
+
 		m_scene.render();
 
 		m_next_reload -= m_window->timestep;

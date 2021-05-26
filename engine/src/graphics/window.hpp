@@ -1,5 +1,7 @@
 #pragma once
 
+#include "int.hpp"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -9,6 +11,8 @@ class Window
 {
 public:
 	double timestep { 0.0 };
+
+	u32 width = 0, height = 0;
 
 	//create a window
 	Window(unsigned width, unsigned height, const std::string& title, bool fullscreen);
