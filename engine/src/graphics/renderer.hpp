@@ -23,6 +23,7 @@ public:
 
 	Shader new_shader(const std::string& name, const std::string& source);
 	Shader get_shader(const std::string& name);
+	void delete_shader(const Shader& shader);
 	void bind_shader(const Shader& shader) const;
 	void set_shader_uniform_int(const Shader& shader, const std::string& name, i32 val) const;
 	void set_shader_uniform_float(const Shader& shader, const std::string& name, float val) const;

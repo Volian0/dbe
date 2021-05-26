@@ -8,7 +8,7 @@
 
 Renderer::~Renderer() {
 	for (const auto& s : m_shaders) {
-		glDeleteProgram(s.second.id);
+		delete_shader(s.second);
 	}
 }
 
@@ -94,6 +94,10 @@ Shader Renderer::get_shader(const std::string& name) {
 	}
 
 	return m_shaders[name];
+}
+
+void Renderer::delete_shader(const Shader& shader) {
+	glDeleteProgram(shader.id);
 }
 
 void Renderer::bind_shader(const Shader& shader) const {
