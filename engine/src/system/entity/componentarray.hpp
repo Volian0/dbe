@@ -22,10 +22,10 @@ private:
 	std::unordered_map <EntityHandle, u32> m_entity_to_index;
 	std::unordered_map <EntityHandle, u32> m_index_to_entity;
 
-	u32 m_size;
+	u32 m_size { 0 };
 public:
 	void insert(EntityHandle entity, T component) {
-		if (m_entity_to_index.find(entity) != m_index_to_entity.end()) {
+		if (m_entity_to_index.find(entity) != m_entity_to_index.end()) {
 			log(LOG_WARNING, "Attempting to add the same\
 				component to an entity twice");
 			return;
