@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include <tuple>
 #include <sstream>
 
@@ -10,10 +12,24 @@ Renderer::~Renderer() {
 	for (const auto& s : m_shaders) {
 		delete_shader(s.second);
 	}
+
+	for (const auto& m : m_meshes) {
+		delete_mesh(m.second);
+	}
 }
 
-void Renderer::render() const {
+void Renderer::render(ECS& ecs) const {
+	for (const auto& entity : m_entities) {
+		auto& shader = ecs.get_component<Shader>(entity);
+		auto& mesh = ecs.get_component<Mesh>(entity);
 
+		bind_shader(shader);
+
+		glBindVertexArray(mesh.va);
+		glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+	}
+
+	glBindVertexArray(0);
 }
 
 static std::pair<std::string, std::string> parse_shaders(const std::string& source) {
@@ -70,8 +86,8 @@ Shader Renderer::new_shader(const std::string& name, const std::string& source) 
 	glCompileShader(v);
 
 	f = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(v, 1, &fs_ptr, nullptr);
-	glCompileShader(v);
+	glShaderSource(f, 1, &fs_ptr, nullptr);
+	glCompileShader(f);
 
 	u32 id;
 	id = glCreateProgram();
@@ -132,4 +148,141 @@ void Renderer::set_shader_uniform_vec4(const Shader& shader, const std::string& 
 void Renderer::set_shader_uniform_mat4(const Shader& shader, const std::string& name, const mat4& val) const {
 	u32 location = glGetUniformLocation(shader.id, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_TRUE, val.elements);
+}
+
+Mesh Renderer::new_mesh(const std::string& name,
+		const std::vector <float>& vertices, const std::vector <u32>& indices,
+		const std::vector <MeshLayoutConfig>& layout_config) {
+	if (m_meshes.count(name) != 0) {
+		log(LOG_WARNING, "A mesh with the name `%s' already exists", name.c_str());
+		return m_meshes[name];
+	}
+
+	Mesh result;
+
+	glGenVertexArrays(1, &result.va);
+	glGenBuffers(1, &result.vb);
+	glGenBuffers(1, &result.ib);
+
+	glBindVertexArray(result.va);
+	glBindBuffer(GL_ARRAY_BUFFER, result.vb);
+
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() *
+			sizeof(float), &vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() *
+			sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	for (const auto& mlc : layout_config) {
+		glVertexAttribPointer(
+			mlc.index,
+			mlc.component_count,
+			GL_FLOAT, GL_FALSE,
+			mlc.stride * sizeof(float),
+			(void*)(u64)(mlc.start_offset * sizeof(float)));
+		glEnableVertexAttribArray(mlc.index);
+	}
+
+	glBindVertexArray(0);
+
+	m_meshes[name] = result;
+	return result;
+}
+
+Mesh Renderer::new_sphere_mesh(const std::string& name, float radius) {
+	float sectorCount = 36.0f;
+	float stackCount = 18.0f;
+
+	std::vector<float> vertices;
+	std::vector<unsigned int> indices;
+
+	float x, y, z, xy;
+	float nx, ny, nz, lengthInv = 1.0f / radius;
+
+	float s, t;
+
+	float sectorStep = 2 * PI / sectorCount;
+	float stackStep = PI / stackCount;
+	float sectorAngle, stackAngle;
+
+	for(int i = 0; i <= stackCount; ++i) {
+		int k1 = i * (sectorCount + 1);
+		int k2 = k1 + sectorCount + 1;
+
+
+		stackAngle = PI / 2 - i * stackStep;
+		xy = radius * cosf(stackAngle);
+		z = radius * sinf(stackAngle);
+
+		for(int j = 0; j <= sectorCount; ++j, ++k1, ++k2) {
+			sectorAngle = j * sectorStep;
+
+			x = xy * cosf(sectorAngle);
+			y = xy * sinf(sectorAngle);
+
+			nx = x * lengthInv;
+			ny = y * lengthInv;
+			nz = z * lengthInv;
+
+			s = (float)j / sectorCount;
+			t = (float)i / stackCount;
+
+			vertices.push_back(x);
+			vertices.push_back(y);
+			vertices.push_back(z);
+			vertices.push_back(nx);
+			vertices.push_back(ny);
+			vertices.push_back(nz);
+			vertices.push_back(s);
+			vertices.push_back(t);
+
+			if (i != 0) {
+				indices.push_back(k1);
+				indices.push_back(k2);
+				indices.push_back(k1 + 1);
+			}
+
+
+			if (i != (stackCount-1)) {
+				indices.push_back(k1 + 1);
+				indices.push_back(k2);
+				indices.push_back(k2 + 1);
+			}
+		}
+	}
+
+	std::vector <MeshLayoutConfig> mlc = {
+		{
+			0, 3, 8, 0
+		},
+		{
+			1, 3, 8, 3
+		},
+		{
+			2, 2, 8, 6
+		},
+	};
+
+	return new_mesh(name, vertices, indices, mlc);
+}
+
+Mesh Renderer::get_mesh(const std::string& name) {
+	if (m_meshes.count(name) == 0) {
+		log(LOG_ERROR, "A mesh with the name `%s' doesn't exist.", name.c_str());
+		return {
+			UINT32_MAX,
+			UINT32_MAX,
+			UINT32_MAX,
+			UINT32_MAX
+		};
+	}
+
+	return m_meshes[name];
+}
+
+void Renderer::delete_mesh(const Mesh& mesh) {
+	glDeleteVertexArrays(1, &mesh.va);
+	glDeleteBuffers(1, &mesh.vb);
+	glDeleteBuffers(1, &mesh.ib);
 }

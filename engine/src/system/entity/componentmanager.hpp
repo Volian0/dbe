@@ -21,8 +21,10 @@ private:
 	const std::shared_ptr <ComponentArray <T>> get_component_array() {
 		const char* type_name = typeid(T).name();
 
-		assert(m_component_types.find(type_name) != m_component_types.end()
-			&& "Component not registered.");
+		if (m_component_types.find(type_name) == m_component_types.end()) {
+			log(LOG_WARNING, "Component not registered.");
+			register_component<T>();
+		}
 
 		return std::static_pointer_cast
 			<ComponentArray <T>>(m_component_arrays[type_name]);

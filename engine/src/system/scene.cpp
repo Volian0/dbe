@@ -20,16 +20,18 @@ Entity Scene::new_entity() {
 Scene::Scene() {
 	/* Register components */
 	m_ecs.register_component<Shader>();
+	m_ecs.register_component<Mesh>();
 
 	/* Register the renderer */
 	{
 		m_renderer = m_ecs.register_system<Renderer>();
 		Signature sig;
 		sig.set(m_ecs.get_component_type<Shader>());
+		sig.set(m_ecs.get_component_type<Mesh>());
 		m_ecs.set_system_signature<Renderer>(sig);
 	}
 }
 
 void Scene::render() {
-	m_renderer->render();
+	m_renderer->render(m_ecs);
 }

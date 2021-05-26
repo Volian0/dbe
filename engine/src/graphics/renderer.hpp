@@ -15,11 +15,29 @@ struct Shader {
 	u32 id;
 };
 
+struct Mesh {
+	u32 va;
+	u32 vb;
+	u32 ib;
+	u32 index_count;
+};
+
+/* Gets forwarded to glVertexAttribPointer
+ * - defining how the shader should interpret
+ * the vertex data. */
+struct MeshLayoutConfig {
+	u32 index;
+	u32 component_count;
+	u32 stride;
+	u32 start_offset;
+};
+
 class Renderer : public System {
 private:
-	std::map<std::string, Shader> m_shaders;
+	std::map <std::string, Shader> m_shaders;
+	std::map <std::string, Mesh> m_meshes;
 public:
-	void render() const;
+	void render(ECS& ecs) const;
 
 	Shader new_shader(const std::string& name, const std::string& source);
 	Shader get_shader(const std::string& name);
@@ -31,6 +49,13 @@ public:
 	void set_shader_uniform_vec3(const Shader& shader, const std::string& name, const vec3& val) const;
 	void set_shader_uniform_vec4(const Shader& shader, const std::string& name, const vec4& val) const;
 	void set_shader_uniform_mat4(const Shader& shader, const std::string& name, const mat4& val) const;
+
+	Mesh new_mesh(const std::string& name,
+		const std::vector <float>& vertices, const std::vector <u32>& indices,
+		const std::vector <MeshLayoutConfig>& layout_config);
+	Mesh new_sphere_mesh(const std::string& name, float radius);
+	Mesh get_mesh(const std::string& name);
+	void delete_mesh(const Mesh& mesh);
 
 	~Renderer();
 };

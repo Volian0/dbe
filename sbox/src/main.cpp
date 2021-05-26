@@ -12,6 +12,7 @@ public:
 
 		Entity e = m_scene.new_entity();
 		e.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
+		e.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere", 1.0));
 	}
 
 	void on_update() override {
