@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include "transform.hpp"
 
 Entity::Entity() {
 
@@ -21,6 +22,7 @@ Scene::Scene() {
 	/* Register components */
 	m_ecs.register_component<Shader>();
 	m_ecs.register_component<Mesh>();
+	m_ecs.register_component<Transform>();
 
 	/* Register the renderer */
 	{

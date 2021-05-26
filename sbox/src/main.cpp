@@ -7,14 +7,17 @@ private:
 	double m_next_reload { 1.0 };
 
 	mat4 m_projection;
+
+	Entity sphere_entity;
 public:
 	void on_init() override {
 		m_scene.m_renderer->new_shader("test shader",
 			ResourceManager::load_string("shaders/test.glsl"));
 
-		Entity e = m_scene.new_entity();
-		e.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
-		e.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere", 1.0));
+		sphere_entity = m_scene.new_entity();
+		sphere_entity.add_component<Transform>({{0.0, 0.0, -3.0}, {0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}});
+		sphere_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
+		sphere_entity.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere", 1.0));
 	}
 
 	void on_update() override {
@@ -25,11 +28,9 @@ public:
 		mat4 transform = mat4::translate({0.0, 0.0, -3.0});
 
 		/* TODO: Projection should be part of the renderer */
-		/* TODO: Transform should have it's own component */
 		Shader s = m_scene.m_renderer->get_shader("test shader");
 		m_scene.m_renderer->bind_shader(s);
 		m_scene.m_renderer->set_shader_uniform_mat4(s, "projection", m_projection);
-		m_scene.m_renderer->set_shader_uniform_mat4(s, "transform", transform);
 
 		m_scene.render();
 

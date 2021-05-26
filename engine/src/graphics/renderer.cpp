@@ -7,6 +7,7 @@
 
 #include "renderer.hpp"
 #include "logger.hpp"
+#include "system/transform.hpp"
 
 Renderer::~Renderer() {
 	for (const auto& s : m_shaders) {
@@ -20,10 +21,12 @@ Renderer::~Renderer() {
 
 void Renderer::render(ECS& ecs) const {
 	for (const auto& entity : m_entities) {
+		auto& transform = ecs.get_component<Transform>(entity);
 		auto& shader = ecs.get_component<Shader>(entity);
 		auto& mesh = ecs.get_component<Mesh>(entity);
 
 		bind_shader(shader);
+		set_shader_uniform_mat4(shader, "transform", get_transform_matrix(transform));
 
 		glBindVertexArray(mesh.va);
 		glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
