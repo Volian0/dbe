@@ -1,38 +1,14 @@
 #include <engine.hpp>
 
-std::string test_source = R"(
-#begin VERTEX
-#version 430 core
-
-layout (location = 0) in vec3 position;
-
-uniform mat4 transform = mat4(1.0);
-uniform mat4 projection = mat4(1.0);
-uniform mat4 view = mat4(1.0);
-
-void main() {
-	gl_Position = view * projection * transform * vec4(position, 1.0);
-}
-#end VERTEX
-
-#begin FRAGMENT
-#version 430 core
-
-out vec4 color;
-
-void main() {
-	color = vec4(1.0);
-}
-
-#end FRAGMENT
-)";
-
 class Sandbox : public Application {
 private:
 	Scene m_scene;
+
+	double m_next_reload { 1.0 };
 public:
 	void on_init() override {
-		m_scene.m_renderer->new_shader("test shader", test_source);
+		m_scene.m_renderer->new_shader("test shader",
+			ResourceManager::load_string("shaders/test.glsl"));
 
 		Entity e = m_scene.new_entity();
 		e.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
@@ -40,6 +16,12 @@ public:
 
 	void on_update() override {
 		m_scene.render();
+
+		m_next_reload -= m_window->timestep;
+		if (m_next_reload <= 0.0) {
+			m_next_reload = 1.0;
+			ResourceManager::hot_reload();
+		}
 	}
 
 	void on_destroy() override {

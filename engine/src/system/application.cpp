@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
 #include "application.hpp"
+#include "resources.hpp"
 
 Application::~Application() {}
 
@@ -10,6 +11,8 @@ void Application::run(const Config& config) {
 		config.height,
 		config.title,
 		config.fullscreen);
+
+	ResourceManager::init("res");
 
 	on_init();
 
@@ -24,4 +27,6 @@ void Application::run(const Config& config) {
 	}
 
 	on_destroy();
+
+	ResourceManager::quit();
 }

@@ -1,6 +1,7 @@
 engine_deps = {
 	"glfw",
-	"glad"
+	"glad",
+	"physfs"
 }
 
 engine_system_deps_windows = {
@@ -30,7 +31,8 @@ project "engine"
 	includedirs {
 		"src",
 		"../extern/glfw/include",
-		"../extern/glad/include"
+		"../extern/glad/include",
+		"../extern/physfs/src"
 	}
 
 	filter "configurations:debug"

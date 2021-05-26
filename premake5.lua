@@ -4,6 +4,7 @@ workspace "dbe"
 group "extern"
 include "extern/glfw"
 include "extern/glad"
+include "extern/physfs"
 
 group "projects"
 include "engine"
