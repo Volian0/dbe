@@ -49,6 +49,10 @@ static void APIENTRY gl_debug_callback(u32 source, u32 type, u32 id,
 	log(se, "OpenGL (source: %s; type: %s): %s", s, t, message);
 }
 
+static void window_resize_callback(GLFWwindow* window, i32 width, i32 height) {
+	glViewport(0, 0, width, height);
+}
+
 Window::Window(unsigned width, unsigned height, const std::string& title, bool fullscreen)
 {
 	//make sure to init GLFW
@@ -76,6 +80,8 @@ Window::Window(unsigned width, unsigned height, const std::string& title, bool f
 		glfwTerminate();
 		throw std::runtime_error("Failed to init GLAD!");
 	}
+
+	glfwSetFramebufferSizeCallback(ptr, window_resize_callback);
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
