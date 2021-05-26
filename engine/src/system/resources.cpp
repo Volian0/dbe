@@ -162,7 +162,6 @@ void ResourceManager::hot_reload() {
 
 		if (stat.modtime > f.second->modtime) {
 			load_text(f.first, true);
-			printf("hi\n");
 		}
 	}
 }
