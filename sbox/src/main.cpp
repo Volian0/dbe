@@ -32,8 +32,10 @@ private:
 	Scene m_scene;
 public:
 	void on_init() override {
+		m_scene.m_renderer->new_shader("test shader", test_source);
+
 		Entity e = m_scene.new_entity();
-		e.add_component<Shader>(m_scene.m_renderer->new_shader("test shader", test_source));
+		e.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
 	}
 
 	void on_update() override {
