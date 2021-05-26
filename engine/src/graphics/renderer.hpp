@@ -36,7 +36,10 @@ class Renderer : public System {
 private:
 	std::map <std::string, Shader> m_shaders;
 	std::map <std::string, Mesh> m_meshes;
+
 public:
+	mat4 m_projection;
+	
 	void render(ECS& ecs) const;
 
 	Shader new_shader(const std::string& name, const std::string& source);

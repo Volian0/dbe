@@ -26,6 +26,7 @@ void Renderer::render(ECS& ecs) const {
 		auto& mesh = ecs.get_component<Mesh>(entity);
 
 		bind_shader(shader);
+		set_shader_uniform_mat4(shader, "projection", m_projection);
 		set_shader_uniform_mat4(shader, "transform", get_transform_matrix(transform));
 
 		glBindVertexArray(mesh.va);
