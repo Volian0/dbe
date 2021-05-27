@@ -20,6 +20,12 @@ struct Mesh {
 	u32 vb;
 	u32 ib;
 	u32 index_count;
+
+	enum class Flags : u32 {
+		DRAW_TRIANGLES = 1 << 0,
+		DRAW_LINES = 1 << 1,
+		DRAW_LINE_STRIP = 1 << 2
+	} flags;
 };
 
 /* Gets forwarded to glVertexAttribPointer
@@ -39,7 +45,7 @@ private:
 
 public:
 	mat4 m_projection;
-	
+
 	void render(ECS& ecs) const;
 
 	Shader new_shader(const std::string& name, const std::string& source);
@@ -53,10 +59,10 @@ public:
 	void set_shader_uniform_vec4(const Shader& shader, const std::string& name, const vec4& val) const;
 	void set_shader_uniform_mat4(const Shader& shader, const std::string& name, const mat4& val) const;
 
-	Mesh new_mesh(const std::string& name,
+	Mesh new_mesh(const std::string& name, const Mesh::Flags& flags,
 		const std::vector <float>& vertices, const std::vector <u32>& indices,
 		const std::vector <MeshLayoutConfig>& layout_config);
-	Mesh new_sphere_mesh(const std::string& name, float radius);
+	Mesh new_sphere_mesh(const std::string& name, const Mesh::Flags& flags, float radius);
 	Mesh get_mesh(const std::string& name);
 	void delete_mesh(const Mesh& mesh);
 

@@ -18,13 +18,15 @@ public:
 			{0.0, 0.0, 0.0}, /* rotation */
 			{1.0, 1.0, 1.0}}); /* scale */
 		sphere_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
-		sphere_entity.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere", 1.0));
+		sphere_entity.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere", Mesh::Flags::DRAW_LINES, 1.0));
 	}
 
 	void on_update() override {
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,
 			0.1, 100.0);
+
+		sphere_entity.get_component<Transform>().rotation.y += 25.0 * m_window->timestep;
 
 		m_scene.render();
 

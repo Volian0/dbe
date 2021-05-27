@@ -29,8 +29,15 @@ void Renderer::render(ECS& ecs) const {
 		set_shader_uniform_mat4(shader, "projection", m_projection);
 		set_shader_uniform_mat4(shader, "transform", get_transform_matrix(transform));
 
+		u32 draw_mode = GL_TRIANGLES;
+		if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINES) {
+			draw_mode = GL_LINES;
+		} else if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINE_STRIP) {
+			draw_mode = GL_LINE_STRIP;
+		}
+
 		glBindVertexArray(mesh.va);
-		glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+		glDrawElements(draw_mode, mesh.index_count, GL_UNSIGNED_INT, 0);
 	}
 
 	glBindVertexArray(0);
@@ -154,7 +161,7 @@ void Renderer::set_shader_uniform_mat4(const Shader& shader, const std::string& 
 	glUniformMatrix4fv(location, 1, GL_TRUE, val.elements);
 }
 
-Mesh Renderer::new_mesh(const std::string& name,
+Mesh Renderer::new_mesh(const std::string& name, const Mesh::Flags& flags,
 		const std::vector <float>& vertices, const std::vector <u32>& indices,
 		const std::vector <MeshLayoutConfig>& layout_config) {
 	if (m_meshes.count(name) != 0) {
@@ -163,6 +170,8 @@ Mesh Renderer::new_mesh(const std::string& name,
 	}
 
 	Mesh result;
+
+	result.flags = flags;
 
 	result.index_count = indices.size();
 
@@ -196,7 +205,7 @@ Mesh Renderer::new_mesh(const std::string& name,
 	return result;
 }
 
-Mesh Renderer::new_sphere_mesh(const std::string& name, float radius) {
+Mesh Renderer::new_sphere_mesh(const std::string& name, const Mesh::Flags& flags, float radius) {
 	float sectorCount = 36.0f;
 	float stackCount = 18.0f;
 
@@ -270,7 +279,7 @@ Mesh Renderer::new_sphere_mesh(const std::string& name, float radius) {
 		},
 	};
 
-	return new_mesh(name, vertices, indices, mlc);
+	return new_mesh(name, flags, vertices, indices, mlc);
 }
 
 Mesh Renderer::get_mesh(const std::string& name) {
