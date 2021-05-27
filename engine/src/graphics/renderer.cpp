@@ -164,6 +164,8 @@ Mesh Renderer::new_mesh(const std::string& name,
 
 	Mesh result;
 
+	result.index_count = indices.size();
+
 	glGenVertexArrays(1, &result.va);
 	glGenBuffers(1, &result.vb);
 	glGenBuffers(1, &result.ib);

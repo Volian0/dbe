@@ -3,6 +3,8 @@ project "sbox"
 	language "C++"
 	cppdialect "C++17"
 
+	debugdir "../"	
+
 	targetdir "bin"
 	objdir "obj"
 
