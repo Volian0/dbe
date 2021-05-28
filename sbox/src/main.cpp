@@ -1,4 +1,5 @@
 #include <engine.hpp>
+#include <system/input.hpp>
 
 class Sandbox : public Application {
 private:
@@ -7,8 +8,12 @@ private:
 	double m_next_reload { 1.0 };
 
 	Entity sphere_entity;
+
+	std::shared_ptr<InputManager> m_input_manager;
 public:
 	void on_init() override {
+		m_input_manager = std::make_shared<InputManager>(*m_window);
+
 		m_scene.m_renderer->new_shader("test shader",
 			ResourceManager::load_string("shaders/test.glsl"));
 
@@ -31,6 +36,24 @@ public:
 	}
 
 	void on_update() override {
+		//handle input
+		m_input_manager->update();
+
+		if (m_input_manager->key_state(GLFW_KEY_ESCAPE) == KeyState::PRESSED)
+		{
+			return m_window->close();
+		}
+
+		auto& sphere_translation = sphere_entity.get_component<Transform>().translation;
+		if (m_input_manager->is_held(GLFW_KEY_W))
+			sphere_translation.y += m_window->timestep;
+		if (m_input_manager->is_held(GLFW_KEY_S))
+			sphere_translation.y -= m_window->timestep;
+		if (m_input_manager->is_held(GLFW_KEY_D))
+			sphere_translation.x += m_window->timestep;
+		if (m_input_manager->is_held(GLFW_KEY_A))
+			sphere_translation.x -= m_window->timestep;
+
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,
 			0.1, 100.0);
