@@ -19,15 +19,22 @@ Renderer::~Renderer() {
 	}
 }
 
-void Renderer::render(ECS& ecs) const {
+void Renderer::render() const {
 	for (const auto& entity : m_entities) {
-		auto& transform = ecs.get_component<Transform>(entity);
-		auto& shader = ecs.get_component<Shader>(entity);
-		auto& mesh = ecs.get_component<Mesh>(entity);
+		auto& transform = m_ecs->get_component<Transform>(entity);
+		auto& shader = m_ecs->get_component<Shader>(entity);
+		auto& mesh = m_ecs->get_component<Mesh>(entity);
+		auto& material = m_ecs->get_component<Material>(entity);
 
 		bind_shader(shader);
-		set_shader_uniform_mat4(shader, "projection", m_projection);
-		set_shader_uniform_mat4(shader, "transform", get_transform_matrix(transform));
+		set_shader_uniform_mat4(shader, "u_projection", m_projection);
+		set_shader_uniform_mat4(shader, "u_transform", get_transform_matrix(transform));
+		set_shader_uniform_vec3(shader, "u_camera_position", vec3(0.0, 0.0, 0.0));
+
+		set_shader_uniform_vec3(shader, "u_material.lit_color", material.lit_color);
+		set_shader_uniform_vec3(shader, "u_material.unlit_color", material.unlit_color);
+		set_shader_uniform_vec3(shader, "u_material.specular_color", material.specular_color);
+		set_shader_uniform_float(shader, "u_material.specular_cutoff", material.specular_cutoff);
 
 		u32 draw_mode = GL_TRIANGLES;
 		if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINES) {
@@ -41,6 +48,22 @@ void Renderer::render(ECS& ecs) const {
 	}
 
 	glBindVertexArray(0);
+}
+
+void LightRenderer::init(Renderer* renderer) {
+	m_renderer = renderer;
+}
+
+void LightRenderer::render() const {
+	for (const auto& entity : m_entities) {
+		auto& shader = m_ecs->get_component<Shader>(entity);
+
+		m_renderer->bind_shader(shader);
+
+		m_renderer->set_shader_uniform_vec3(shader, "u_sun.direction", m_sun.direction);
+		m_renderer->set_shader_uniform_vec3(shader, "u_sun.color", m_sun.color);
+		m_renderer->set_shader_uniform_float(shader, "u_sun.intensity", m_sun.intensity);
+	}
 }
 
 static std::pair<std::string, std::string> parse_shaders(const std::string& source) {
@@ -280,6 +303,65 @@ Mesh Renderer::new_sphere_mesh(const std::string& name, const Mesh::Flags& flags
 	};
 
 	return new_mesh(name, flags, vertices, indices, mlc);
+}
+
+Mesh Renderer::new_cube_mesh(const std::string& name, const Mesh::Flags& flags) {
+	std::vector <MeshLayoutConfig> mlc = {
+		{
+			0, 3, 8, 0
+		},
+		{
+			1, 3, 8, 3
+		},
+		{
+			2, 2, 8, 6
+		},
+	};
+
+	return new_mesh(name, flags,
+		std::vector<float> {
+			1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.625, 0.500,
+			-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.875, 0.500,
+			-1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.875, 0.750,
+			1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.625, 0.500,
+			-1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.875, 0.750,
+			1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.625, 0.750,
+			1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.375, 0.750,
+			1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.625, 0.750,
+			-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.625, 1.0f,
+			1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.375, 0.750,
+			-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.625, 1.0f,
+			-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.375, 1.0f,
+			-1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.375, 0.0f,
+			-1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.625, 0.0f,
+			-1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.625, 0.250,
+			-1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.375, 0.0f,
+			-1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.625, 0.250,
+			-1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.375, 0.250,
+			-1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.125, 0.500,
+			1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.375, 0.500,
+			1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.375, 0.750,
+			-1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.125, 0.500,
+			1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.375, 0.750,
+			-1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.125, 0.750,
+			1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.375, 0.500,
+			1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.625, 0.500,
+			1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.625, 0.750,
+			1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.375, 0.500,
+			1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.625, 0.750,
+			1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.375, 0.750,
+			-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.375, 0.250,
+			-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.625, 0.250,
+			1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.625, 0.500,
+			-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.375, 0.250,
+			1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.625, 0.500,
+			1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.375, 0.500,
+		},
+		std::vector<u32> {
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+		},
+		mlc
+	);
 }
 
 Mesh Renderer::get_mesh(const std::string& name) {

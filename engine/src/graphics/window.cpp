@@ -91,6 +91,9 @@ Window::Window(unsigned width, unsigned height, const std::string& title, bool f
 
 	glfwSetFramebufferSizeCallback(ptr, window_resize_callback);
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(gl_debug_callback, nullptr);

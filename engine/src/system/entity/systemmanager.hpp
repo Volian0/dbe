@@ -9,8 +9,14 @@
 #include "ecommon.hpp"
 #include "logger.hpp"
 
+class ECS;
+
 class System {
-public:
+protected:
+	friend class SystemManager;
+	friend class ECS;
+
+	ECS* m_ecs;
 	std::set <EntityHandle> m_entities;
 };
 
@@ -19,7 +25,7 @@ private:
 	std::unordered_map <const char*, Signature> m_signatures;
 	std::unordered_map <const char*, std::shared_ptr<System>> m_systems;
 public:
-	template <typename T>
+	template <typename T, typename... Args>
 	std::shared_ptr<T> register_system() {
 		const char* type_name = typeid(T).name();
 

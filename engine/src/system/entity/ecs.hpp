@@ -62,7 +62,10 @@ public:
 
 	template <typename T>
 	std::shared_ptr<T> register_system() {
-		return m_system_manager->register_system<T>();
+		auto sys = m_system_manager->register_system<T>();
+		sys->m_ecs = this;
+
+		return sys;
 	}
 
 	template <typename T>

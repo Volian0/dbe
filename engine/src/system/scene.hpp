@@ -12,6 +12,7 @@ private:
 	friend class Entity;
 public:
 	std::shared_ptr <Renderer> m_renderer;
+	std::shared_ptr <LightRenderer> m_light_renderer;
 
 	Scene();
 

@@ -28,6 +28,13 @@ struct Mesh {
 	} flags;
 };
 
+struct Material {
+	vec3 lit_color;
+	vec3 unlit_color;
+	vec3 specular_color;
+	float specular_cutoff;
+};
+
 /* Gets forwarded to glVertexAttribPointer
  * - defining how the shader should interpret
  * the vertex data. */
@@ -46,7 +53,7 @@ private:
 public:
 	mat4 m_projection;
 
-	void render(ECS& ecs) const;
+	void render() const;
 
 	Shader new_shader(const std::string& name, const std::string& source);
 	Shader get_shader(const std::string& name);
@@ -63,8 +70,26 @@ public:
 		const std::vector <float>& vertices, const std::vector <u32>& indices,
 		const std::vector <MeshLayoutConfig>& layout_config);
 	Mesh new_sphere_mesh(const std::string& name, const Mesh::Flags& flags, float radius);
+	Mesh new_cube_mesh(const std::string& name, const Mesh::Flags& flags);
 	Mesh get_mesh(const std::string& name);
 	void delete_mesh(const Mesh& mesh);
 
 	~Renderer();
+};
+
+struct Sun {
+	vec3 direction;
+	vec3 color;
+	float intensity;
+};
+
+class LightRenderer : public System {
+private:
+	Renderer* m_renderer { nullptr };
+public:
+	Sun m_sun { {0.5, -1.0, 0.0}, {1.0, 1.0, 1.0}, 1.0};
+
+	void init(Renderer* renderer);
+
+	void render() const;
 };
