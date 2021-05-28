@@ -9,6 +9,8 @@
 
 class Window
 {
+	friend class InputManager;
+
 public:
 	double timestep { 0.0 };
 
@@ -25,8 +27,11 @@ public:
 
 	void event_update() const;
 
+	void close();
+
 private:
 	GLFWwindow* ptr;
+	class InputManager* input_manager;
 
 	double last_time = 0.0, now_time = 0.0;
 };
