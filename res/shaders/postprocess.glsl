@@ -72,8 +72,6 @@ vec4 do_fxaa(vec4 color) {
 }
 
 vec4 do_outline(vec4 color, float thickness) {
-	float depth = texture2D(u_depth, v_uv).r;
-
 	float scale = thickness;
 
 	float half_scale_floor = floor(scale * 0.5);
