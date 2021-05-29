@@ -7,7 +7,7 @@ private:
 	double m_next_reload { 1.0 };
 
 	Entity sphere_entity;
-	Entity sphere_entity2;
+	Entity cube_entity;
 
 	std::shared_ptr<InputManager> m_input_manager;
 public:
@@ -21,7 +21,7 @@ public:
 			ResourceManager::load_string("shaders/depth.glsl"));
 
 		m_scene.m_renderer->new_shader("test shader",
-			ResourceManager::load_string("shaders/test.glsl"));
+			ResourceManager::load_string("shaders/cel.glsl"));
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
@@ -40,14 +40,14 @@ public:
 			0.9, /* specular_cutoff */
 		});
 
-		sphere_entity2 = m_scene.new_entity();
-		sphere_entity2.add_component<Transform>({
+		cube_entity = m_scene.new_entity();
+		cube_entity.add_component<Transform>({
 			{1.0, 0.0, -3.0}, /* translation */
 			{0.0, 0.0, 0.0}, /* rotation */
 			{1.0, 1.0, 1.0}}); /* scale */
-		sphere_entity2.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
-		sphere_entity2.add_component<Mesh>(m_scene.m_renderer->get_mesh("sphere"));
-		sphere_entity2.add_component<Material>({
+		cube_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
+		cube_entity.add_component<Mesh>(m_scene.m_renderer->new_cube_mesh("cube", Mesh::Flags::DRAW_TRIANGLES));
+		cube_entity.add_component<Material>({
 			{0.196, 0.235, 0.821}, /* lit color */
 			{0.055, 0.082, 0.447}, /* unlit color */
 			{0.445, 0.588, 0.898}, /* specular color */
@@ -75,6 +75,10 @@ public:
 			sphere_translation.x += m_window->timestep;
 		if (m_input_manager->is_held(GLFW_KEY_A))
 			sphere_translation.x -= m_window->timestep;
+
+		auto& cube_rotation = cube_entity.get_component<Transform>().rotation;
+		cube_rotation.x += 25.0 * m_window->timestep;
+		cube_rotation.y += 25.0 * m_window->timestep;
 
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,
