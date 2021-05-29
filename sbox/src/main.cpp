@@ -7,6 +7,7 @@ private:
 	double m_next_reload { 1.0 };
 
 	Entity sphere_entity;
+	Entity sphere_entity2;
 
 	std::shared_ptr<InputManager> m_input_manager;
 public:
@@ -33,6 +34,21 @@ public:
 			{0.788, 0.176, 0.133}, /* lit color */
 			{0.388, 0.141, 0.121}, /* unlit color */
 			{0.886, 0.557, 0.533}, /* specular color */
+			0.9, /* specular_cutoff */
+		});
+
+		sphere_entity2 = m_scene.new_entity();
+		sphere_entity2.add_component<Transform>({
+			{1.0, 0.0, -3.0}, /* translation */
+			{0.0, 0.0, 0.0}, /* rotation */
+			{1.0, 1.0, 1.0}}); /* scale */
+		sphere_entity2.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
+		sphere_entity2.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere",
+			Mesh::Flags::DRAW_TRIANGLES, 1.0));
+		sphere_entity2.add_component<Material>({
+			{0.196, 0.235, 0.821}, /* lit color */
+			{0.055, 0.082, 0.447}, /* unlit color */
+			{0.445, 0.588, 0.898}, /* specular color */
 			0.9, /* specular_cutoff */
 		});
 
