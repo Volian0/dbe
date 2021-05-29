@@ -32,10 +32,24 @@ void main() {
 
 	float depth = texture2D(u_depth, v_uv).r;
 
-	float depth0 = texture2D(u_depth, vec2(v_uv.x - 0.002, v_uv.y - 0.002)).r;
-	float depth1 = texture2D(u_depth, vec2(v_uv.x + 0.002, v_uv.y - 0.002)).r;
-	float depth2 = texture2D(u_depth, vec2(v_uv.x + 0.002, v_uv.y + 0.002)).r;
-	float depth3 = texture2D(u_depth, vec2(v_uv.x - 0.002, v_uv.y + 0.002)).r;
+	float scale = 2;
+
+	float half_scale_floor = floor(scale * 0.5);
+	float half_scale_ceil = ceil(scale * 0.5);
+
+	vec2 texel_size = vec2(1.0 / u_width, 1.0 / u_height);
+
+	vec2 bottom_left = v_uv - texel_size * half_scale_floor;
+	vec2 top_right = v_uv + texel_size * half_scale_ceil;
+	vec2 bottom_right = v_uv + vec2(texel_size.x * half_scale_ceil,
+		-texel_size.y * half_scale_floor);
+	vec2 top_left = v_uv + vec2(-texel_size.x * half_scale_floor,
+		texel_size.y * half_scale_ceil);
+
+	float depth0 = texture2D(u_depth, bottom_left).r;
+	float depth1 = texture2D(u_depth, top_right).r;
+	float depth2 = texture2D(u_depth, bottom_right).r;
+	float depth3 = texture2D(u_depth, top_left).r;
 
 	float depth_finite_difference0 = depth1 - depth0;
 	float depth_finite_difference1 = depth3 - depth2;
