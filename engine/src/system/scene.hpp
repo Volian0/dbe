@@ -18,7 +18,7 @@ public:
 
 	Entity new_entity();
 
-	void render();
+	void render(const vec2& fb_size);
 };
 
 struct Entity {

@@ -1,5 +1,4 @@
 #include <engine.hpp>
-#include <system/input.hpp>
 
 class Sandbox : public Application {
 private:
@@ -14,8 +13,13 @@ public:
 	void on_init() override {
 		m_input_manager = std::make_shared<InputManager>(*m_window);
 
+		m_scene.m_renderer->new_shader("postprocess",
+			ResourceManager::load_string("shaders/postprocess.glsl"));
+
 		m_scene.m_renderer->new_shader("test shader",
 			ResourceManager::load_string("shaders/test.glsl"));
+
+		m_scene.m_renderer->init("postprocess");
 
 		sphere_entity = m_scene.new_entity();
 		sphere_entity.add_component<Transform>({
@@ -58,7 +62,7 @@ public:
 			(float)m_window->width/(float)m_window->height,
 			0.1, 100.0);
 
-		m_scene.render();
+		m_scene.render(vec2{m_window->width, m_window->height});
 
 		m_next_reload -= m_window->timestep;
 		if (m_next_reload <= 0.0) {

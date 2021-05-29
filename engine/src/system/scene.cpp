@@ -48,7 +48,7 @@ Scene::Scene() {
 	}
 }
 
-void Scene::render() {
+void Scene::render(const vec2& fb_size) {
 	m_light_renderer->render();
-	m_renderer->render();
+	m_renderer->render(fb_size);
 }

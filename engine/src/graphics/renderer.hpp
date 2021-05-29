@@ -10,6 +10,8 @@
 #include "system/entity/ecs.hpp"
 #include "int.hpp"
 #include "maths/maths.hpp"
+#include "rendertarget.hpp"
+#include "depthbuffer.hpp"
 
 struct Shader {
 	u32 id;
@@ -50,10 +52,16 @@ private:
 	std::map <std::string, Shader> m_shaders;
 	std::map <std::string, Mesh> m_meshes;
 
+	Shader m_postprocess;
+	Mesh m_fullscreen_quad;
+
+	std::shared_ptr <RenderTarget> m_rendertarget;
 public:
 	mat4 m_projection;
 
-	void render() const;
+	void init(const std::string& postprocess_shader);
+
+	void render(const vec2& fb_size);
 
 	Shader new_shader(const std::string& name, const std::string& source);
 	Shader get_shader(const std::string& name);
@@ -72,6 +80,7 @@ public:
 	Mesh new_sphere_mesh(const std::string& name, const Mesh::Flags& flags, float radius);
 	Mesh new_cube_mesh(const std::string& name, const Mesh::Flags& flags);
 	Mesh get_mesh(const std::string& name);
+	void draw_mesh(const Mesh& mesh);
 	void delete_mesh(const Mesh& mesh);
 
 	~Renderer();

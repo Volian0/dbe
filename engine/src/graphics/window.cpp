@@ -89,14 +89,15 @@ Window::Window(unsigned width, unsigned height, const std::string& title, bool f
 	}
 
 	glfwSetWindowUserPointer(ptr, this);
-
 	glfwSetFramebufferSizeCallback(ptr, window_resize_callback);
+
+	glViewport(0, 0, width, height);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	glEnable(GL_MULTISAMPLE);
-	
+
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(gl_debug_callback, nullptr);

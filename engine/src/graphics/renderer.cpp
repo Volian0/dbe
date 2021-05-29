@@ -19,7 +19,43 @@ Renderer::~Renderer() {
 	}
 }
 
-void Renderer::render() const {
+
+void Renderer::init(const std::string& postprocess_shader) {
+	m_postprocess = get_shader(postprocess_shader);
+
+	m_rendertarget = std::make_shared<RenderTarget>(vec2{1024, 1024});
+
+	std::vector<MeshLayoutConfig> mlc = {
+		{
+			0, 2, 4, 0
+		},
+
+		{
+			1, 2, 4, 2
+		}
+	};
+
+	m_fullscreen_quad = new_mesh("fullscreen quad", Mesh::Flags::DRAW_TRIANGLES,
+		{
+			/* position     UV */
+			 1.0,  1.0, 	1.0f, 1.0f,
+			 1.0, -1.0, 	1.0f, 0.0f,
+			-1.0, -1.0, 	0.0f, 0.0f,
+			-1.0,  1.0, 	0.0f, 1.0f
+		},
+		{
+			0, 1, 3,
+			1, 2, 3
+		}, mlc
+	);
+}
+
+void Renderer::render(const vec2& fb_size) {
+	glClearColor(0.9, 0.9, 1.0, 1.0);
+
+	m_rendertarget->resize(fb_size);
+	m_rendertarget->bind();
+
 	for (const auto& entity : m_entities) {
 		auto& transform = m_ecs->get_component<Transform>(entity);
 		auto& shader = m_ecs->get_component<Shader>(entity);
@@ -36,16 +72,17 @@ void Renderer::render() const {
 		set_shader_uniform_vec3(shader, "u_material.specular_color", material.specular_color);
 		set_shader_uniform_float(shader, "u_material.specular_cutoff", material.specular_cutoff);
 
-		u32 draw_mode = GL_TRIANGLES;
-		if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINES) {
-			draw_mode = GL_LINES;
-		} else if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINE_STRIP) {
-			draw_mode = GL_LINE_STRIP;
-		}
-
-		glBindVertexArray(mesh.va);
-		glDrawElements(draw_mode, mesh.index_count, GL_UNSIGNED_INT, 0);
+		draw_mesh(mesh);
 	}
+
+	m_rendertarget->unbind(fb_size);
+	m_rendertarget->bind_output(0);
+
+	bind_shader(m_postprocess);
+	set_shader_uniform_float(m_postprocess, "u_width", fb_size.x);
+	set_shader_uniform_float(m_postprocess, "u_height", fb_size.y);
+	set_shader_uniform_int(m_postprocess, "u_input", 0);
+	draw_mesh(m_fullscreen_quad);
 
 	glBindVertexArray(0);
 }
@@ -376,6 +413,18 @@ Mesh Renderer::get_mesh(const std::string& name) {
 	}
 
 	return m_meshes[name];
+}
+
+void Renderer::draw_mesh(const Mesh& mesh) {
+	u32 draw_mode = GL_TRIANGLES;
+	if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINES) {
+		draw_mode = GL_LINES;
+	} else if ((u32)mesh.flags & (u32)Mesh::Flags::DRAW_LINE_STRIP) {
+		draw_mode = GL_LINE_STRIP;
+	}
+
+	glBindVertexArray(mesh.va);
+	glDrawElements(draw_mode, mesh.index_count, GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::delete_mesh(const Mesh& mesh) {
