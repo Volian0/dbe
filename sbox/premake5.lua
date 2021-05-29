@@ -3,7 +3,7 @@ project "sbox"
 	language "C++"
 	cppdialect "C++17"
 
-	debugdir "../"	
+	debugdir "../"
 
 	targetdir "bin"
 	objdir "obj"
@@ -16,6 +16,8 @@ project "sbox"
 	includedirs {
 		"../extern/glfw/include",
 		"../extern/glad/include",
+		"../extern/physfs/src",
+		"../extern/assimp/include",
 		"../engine/src"
 	}
 
