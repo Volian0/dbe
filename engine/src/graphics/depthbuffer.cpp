@@ -11,6 +11,9 @@ DepthBuffer::DepthBuffer(const vec2& size) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
 		size.x, size.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fb);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_output, 0);
 	glDrawBuffer(GL_NONE);
@@ -43,6 +46,9 @@ void DepthBuffer::resize(const vec2& size) {
 	glBindTexture(GL_TEXTURE_2D, m_output);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
 		size.x, size.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_output, 0);
 	glDrawBuffer(GL_NONE);

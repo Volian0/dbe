@@ -20,10 +20,12 @@ Renderer::~Renderer() {
 }
 
 
-void Renderer::init(const std::string& postprocess_shader) {
+void Renderer::init(const std::string& postprocess_shader, const std::string& depth_shader) {
 	m_postprocess = get_shader(postprocess_shader);
+	m_depth = get_shader(depth_shader);
 
 	m_rendertarget = std::make_shared<RenderTarget>(vec2{1024, 1024});
+	m_depth_buffer = std::make_shared<DepthBuffer>(vec2{1024, 1024});
 
 	std::vector<MeshLayoutConfig> mlc = {
 		{
@@ -53,6 +55,22 @@ void Renderer::init(const std::string& postprocess_shader) {
 void Renderer::render(const vec2& fb_size) {
 	glClearColor(0.9, 0.9, 1.0, 1.0);
 
+	m_depth_buffer->resize(fb_size);
+	m_depth_buffer->bind();
+
+	bind_shader(m_depth);
+
+	for (const auto& entity : m_entities) {
+		auto& transform = m_ecs->get_component<Transform>(entity);
+		auto& mesh = m_ecs->get_component<Mesh>(entity);
+
+		set_shader_uniform_mat4(m_depth, "u_projection", m_projection);
+		set_shader_uniform_mat4(m_depth, "u_transform", get_transform_matrix(transform));
+		set_shader_uniform_vec3(m_depth, "u_camera_position", vec3(0.0, 0.0, 0.0));
+
+		draw_mesh(mesh);
+	}
+
 	m_rendertarget->resize(fb_size);
 	m_rendertarget->bind();
 
@@ -77,11 +95,13 @@ void Renderer::render(const vec2& fb_size) {
 
 	m_rendertarget->unbind(fb_size);
 	m_rendertarget->bind_output(0);
+	m_depth_buffer->bind_output(1);
 
 	bind_shader(m_postprocess);
 	set_shader_uniform_float(m_postprocess, "u_width", fb_size.x);
 	set_shader_uniform_float(m_postprocess, "u_height", fb_size.y);
 	set_shader_uniform_int(m_postprocess, "u_input", 0);
+	set_shader_uniform_int(m_postprocess, "u_depth", 1);
 	draw_mesh(m_fullscreen_quad);
 
 	glBindVertexArray(0);

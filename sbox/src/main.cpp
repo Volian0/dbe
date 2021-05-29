@@ -17,10 +17,13 @@ public:
 		m_scene.m_renderer->new_shader("postprocess",
 			ResourceManager::load_string("shaders/postprocess.glsl"));
 
+		m_scene.m_renderer->new_shader("depth",
+			ResourceManager::load_string("shaders/depth.glsl"));
+
 		m_scene.m_renderer->new_shader("test shader",
 			ResourceManager::load_string("shaders/test.glsl"));
 
-		m_scene.m_renderer->init("postprocess");
+		m_scene.m_renderer->init("postprocess", "depth");
 
 		sphere_entity = m_scene.new_entity();
 		sphere_entity.add_component<Transform>({
@@ -43,8 +46,7 @@ public:
 			{0.0, 0.0, 0.0}, /* rotation */
 			{1.0, 1.0, 1.0}}); /* scale */
 		sphere_entity2.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
-		sphere_entity2.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere",
-			Mesh::Flags::DRAW_TRIANGLES, 1.0));
+		sphere_entity2.add_component<Mesh>(m_scene.m_renderer->get_mesh("sphere"));
 		sphere_entity2.add_component<Material>({
 			{0.196, 0.235, 0.821}, /* lit color */
 			{0.055, 0.082, 0.447}, /* unlit color */

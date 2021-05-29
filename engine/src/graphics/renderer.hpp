@@ -53,13 +53,16 @@ private:
 	std::map <std::string, Mesh> m_meshes;
 
 	Shader m_postprocess;
+	Shader m_depth;
+	
 	Mesh m_fullscreen_quad;
 
 	std::shared_ptr <RenderTarget> m_rendertarget;
+	std::shared_ptr <DepthBuffer> m_depth_buffer;
 public:
 	mat4 m_projection;
 
-	void init(const std::string& postprocess_shader);
+	void init(const std::string& postprocess_shader, const std::string& depth_shader);
 
 	void render(const vec2& fb_size);
 
