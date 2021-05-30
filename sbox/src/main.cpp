@@ -82,9 +82,9 @@ public:
 		if (m_input_manager->is_held(GLFW_KEY_A))
 			sphere_translation.x -= m_window->timestep;
 
-		//auto& cube_rotation = cube_entity.get_component<Transform>().rotation;
-		//cube_rotation.x += 25.0 * m_window->timestep;
-		//cube_rotation.y += 25.0 * m_window->timestep;
+		auto& cube_rotation = cube_entity.get_component<Transform>().rotation;
+		cube_rotation.x += 25.0 * m_window->timestep;
+		cube_rotation.y += 25.0 * m_window->timestep;
 
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,

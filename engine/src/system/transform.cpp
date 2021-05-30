@@ -15,7 +15,7 @@ mat4 get_transform_matrix(const Transform& transform) {
 	result *= mat4::scale(transform.scale);
 
 	if (transform.parent && transform.parent->has_component<Transform>()) {
-		result *= get_transform_matrix(transform.parent->get_component<Transform>());
+		result = get_transform_matrix(transform.parent->get_component<Transform>()) * result;
 	}
 
 	return result;
