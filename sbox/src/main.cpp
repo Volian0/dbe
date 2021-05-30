@@ -8,6 +8,7 @@ private:
 
 	Entity sphere_entity;
 	Entity cube_entity;
+	Entity parent;
 
 	std::shared_ptr<InputManager> m_input_manager;
 public:
@@ -25,11 +26,15 @@ public:
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
+		parent = m_scene.new_entity();
+		parent.add_component<Transform>(Transform{});
+
 		sphere_entity = m_scene.new_entity();
 		sphere_entity.add_component<Transform>({
 			{0.0, 0.0, -3.0}, /* translation */
 			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}}); /* scale */
+			{1.0, 1.0, 1.0}, /* scale */
+			&parent});
 		sphere_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
 		sphere_entity.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere",
 			Mesh::Flags::DRAW_TRIANGLES, 1.0));
@@ -44,7 +49,8 @@ public:
 		cube_entity.add_component<Transform>({
 			{1.0, 0.0, -3.0}, /* translation */
 			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}}); /* scale */
+			{1.0, 1.0, 1.0}, /* scale */
+			&parent});
 		cube_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
 		cube_entity.add_component<Mesh>(m_scene.m_renderer->new_cube_mesh("cube", Mesh::Flags::DRAW_TRIANGLES));
 		cube_entity.add_component<Material>({
@@ -66,7 +72,7 @@ public:
 			return m_window->close();
 		}
 
-		auto& sphere_translation = sphere_entity.get_component<Transform>().translation;
+		auto& sphere_translation = parent.get_component<Transform>().translation;
 		if (m_input_manager->is_held(GLFW_KEY_W))
 			sphere_translation.y += m_window->timestep;
 		if (m_input_manager->is_held(GLFW_KEY_S))
@@ -76,9 +82,9 @@ public:
 		if (m_input_manager->is_held(GLFW_KEY_A))
 			sphere_translation.x -= m_window->timestep;
 
-		auto& cube_rotation = cube_entity.get_component<Transform>().rotation;
-		cube_rotation.x += 25.0 * m_window->timestep;
-		cube_rotation.y += 25.0 * m_window->timestep;
+		//auto& cube_rotation = cube_entity.get_component<Transform>().rotation;
+		//cube_rotation.x += 25.0 * m_window->timestep;
+		//cube_rotation.y += 25.0 * m_window->timestep;
 
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,

@@ -1,4 +1,5 @@
 #include "transform.hpp"
+#include "scene.hpp"
 
 mat4 get_transform_matrix(const Transform& transform) {
 	mat4 result(1.0f);
@@ -12,6 +13,10 @@ mat4 get_transform_matrix(const Transform& transform) {
 
 	result *= rotation_matrix;
 	result *= mat4::scale(transform.scale);
+
+	if (transform.parent && transform.parent->has_component<Transform>()) {
+		result *= get_transform_matrix(transform.parent->get_component<Transform>());
+	}
 
 	return result;
 }
