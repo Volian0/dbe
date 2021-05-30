@@ -84,7 +84,7 @@ public:
 			(float)m_window->width/(float)m_window->height,
 			0.1, 100.0);
 
-		m_scene.render(vec2{m_window->width, m_window->height});
+		m_scene.render(vec2{(float)m_window->width, (float)m_window->height});
 
 		m_next_reload -= m_window->timestep;
 		if (m_next_reload <= 0.0) {
