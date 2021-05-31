@@ -58,8 +58,9 @@ public:
 	}
 
 	template <typename T>
-	void add_component(EntityHandle entity, const T& component) {
+	T& add_component(EntityHandle entity, const T& component) {
 		get_component_array<T>()->insert(entity, component);
+		return get_component_array<T>()->get(entity);
 	}
 
 	template <typename T>

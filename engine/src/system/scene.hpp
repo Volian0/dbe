@@ -15,7 +15,7 @@ public:
 	std::shared_ptr <LightRenderer> m_light_renderer;
 
 	Scene();
-
+	
 	Entity new_entity();
 
 	void render(const vec2& fb_size);
@@ -39,7 +39,7 @@ struct Entity {
 	}
 
 	template <typename T>
-	void add_component(const T& c) {
+	T& add_component(const T& c) {
 		assert(scene != nullptr);
 
 		return scene->m_ecs.add_component<T>(handle, c);

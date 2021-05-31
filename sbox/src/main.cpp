@@ -6,9 +6,7 @@ private:
 
 	double m_next_reload { 1.0 };
 
-	Entity sphere_entity;
-	Entity cube_entity;
-	Entity parent;
+	Entity monkey;
 
 	std::shared_ptr<InputManager> m_input_manager;
 public:
@@ -26,39 +24,9 @@ public:
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
-		parent = m_scene.new_entity();
-		parent.add_component<Transform>(Transform{});
-
-		sphere_entity = m_scene.new_entity();
-		sphere_entity.add_component<Transform>({
-			{0.0, 0.0, -3.0}, /* translation */
-			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}, /* scale */
-			&parent});
-		sphere_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
-		sphere_entity.add_component<Mesh>(m_scene.m_renderer->new_sphere_mesh("sphere",
-			Mesh::Flags::DRAW_TRIANGLES, 1.0));
-		sphere_entity.add_component<Material>({
-			{0.788, 0.176, 0.133}, /* lit color */
-			{0.388, 0.141, 0.121}, /* unlit color */
-			{0.886, 0.557, 0.533}, /* specular color */
-			0.9, /* specular_cutoff */
-		});
-
-		cube_entity = m_scene.new_entity();
-		cube_entity.add_component<Transform>({
-			{1.0, 0.0, -3.0}, /* translation */
-			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}, /* scale */
-			&parent});
-		cube_entity.add_component<Shader>(m_scene.m_renderer->get_shader("test shader"));
-		cube_entity.add_component<Mesh>(m_scene.m_renderer->new_cube_mesh("cube", Mesh::Flags::DRAW_TRIANGLES));
-		cube_entity.add_component<Material>({
-			{0.196, 0.235, 0.821}, /* lit color */
-			{0.055, 0.082, 0.447}, /* unlit color */
-			{0.445, 0.588, 0.898}, /* specular color */
-			0.9, /* specular_cutoff */
-		});
+		monkey = load_model(m_scene, "res/monkey.glb", "test shader");
+		monkey.get_component<Transform>().translation.z = -3.0;
+		monkey.get_component<Transform>().rotation.y = 25.0;
 
 		m_scene.m_light_renderer->m_sun.direction = { 0.5, -1.0, -1.0 };
 	}
@@ -71,20 +39,6 @@ public:
 		{
 			return m_window->close();
 		}
-
-		auto& sphere_translation = parent.get_component<Transform>().translation;
-		if (m_input_manager->is_held(GLFW_KEY_W))
-			sphere_translation.y += m_window->timestep;
-		if (m_input_manager->is_held(GLFW_KEY_S))
-			sphere_translation.y -= m_window->timestep;
-		if (m_input_manager->is_held(GLFW_KEY_D))
-			sphere_translation.x += m_window->timestep;
-		if (m_input_manager->is_held(GLFW_KEY_A))
-			sphere_translation.x -= m_window->timestep;
-
-		auto& cube_rotation = cube_entity.get_component<Transform>().rotation;
-		cube_rotation.x += 25.0 * m_window->timestep;
-		cube_rotation.y += 25.0 * m_window->timestep;
 
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,

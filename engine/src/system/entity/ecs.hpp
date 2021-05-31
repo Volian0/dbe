@@ -23,14 +23,16 @@ public:
 	}
 
 	template <typename T>
-	void add_component(EntityHandle entity, const T& component) {
-		m_component_manager->add_component<T>(entity, component);
+	T& add_component(EntityHandle entity, const T& component) {
+		T& c = m_component_manager->add_component<T>(entity, component);
 
 		auto signature = m_entity_manager->get_signature(entity);
 		signature.set(m_component_manager->get_component_type<T>(), true);
 		m_entity_manager->set_signature(entity, signature);
 
 		m_system_manager->on_entity_signature_changed(entity, signature);
+
+		return c;
 	}
 
 	template <typename T>
