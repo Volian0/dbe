@@ -146,7 +146,16 @@ void process_node(Scene& scene, Entity* parent, aiNode* node, const aiScene* mod
 	}
 
 	for (u32 i = 0; i < node->mNumChildren; i++) {
-		process_node(scene, parent, node->mChildren[i], model);
+		Entity entity = scene.new_entity();
+		entity.add_component<Transform>({
+			{0.0, 0.0, 0.0}, /* translation */
+			{0.0, 0.0, 0.0}, /* rotation */
+			{1.0, 1.0, 1.0}, /* scale */
+		});
+
+		entity.parent_to(parent);
+
+		process_node(scene, &entity, node->mChildren[i], model);
 	}
 }
 

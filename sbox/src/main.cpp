@@ -39,7 +39,7 @@ public:
 			return m_window->close();
 		}
 
-		monkey.get_component<Transform>().rotation.y += 25.0 * m_window->timestep;
+		//monkey.get_component<Transform>().rotation.y += 25.0 * m_window->timestep;
 
 		m_scene.update();
 
