@@ -19,12 +19,12 @@ public:
 		m_scene.m_renderer->new_shader("depth",
 			ResourceManager::load_string("shaders/depth.glsl"));
 
-		m_scene.m_renderer->new_shader("test shader",
+		m_scene.m_renderer->new_shader("cel",
 			ResourceManager::load_string("shaders/cel.glsl"));
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
-		monkey = load_model(m_scene, "res/monkey.glb", "test shader");
+		monkey = load_model(m_scene, "res/monkey.glb", "cel");
 		monkey.get_component<Transform>().translation.z = -3.0;
 		monkey.get_component<Transform>().rotation.y = 25.0;
 

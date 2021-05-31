@@ -63,7 +63,7 @@ void main() {
 	float intensity = 0.6 * diff + 0.4 * spec;
 	if (intensity > u_material.specular_cutoff) {
 		final = u_material.specular_color;
-	} else if (intensity > 0.35) {
+	} else if (intensity > 0.2) {
 		final = u_material.lit_color;
 	} else {
 		final = u_material.unlit_color;
