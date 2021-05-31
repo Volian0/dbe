@@ -1,9 +1,39 @@
 #include <engine.hpp>
 #include <imgui.h>
 
-static void draw_entity_hierarchy(Entity entity) {
 
-}
+class EntityHierarchyRenderer : public System {
+private:
+public:
+	void render_entity(EntityHandle entity) {
+		const auto& tag = m_ecs->get_component<Tag>(entity);
+		const auto& hierarchy = m_ecs->get_component<Hierarchy>(entity);
+
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+		if (hierarchy.children.size() <= 0) {
+			flags |= ImGuiTreeNodeFlags_Leaf;
+		}
+
+		if (ImGui::TreeNodeEx((void*)(u32)entity, flags, "%s", tag.name.c_str())) {
+			for (const auto& child : hierarchy.children) {
+				render_entity(child);
+			}
+
+			ImGui::TreePop();
+		}
+	}
+
+	void render() {
+		for (const auto& entity : m_entities) {
+			const auto& hierarchy = m_ecs->get_component<Hierarchy>(entity);
+
+			if (hierarchy.parent == NULL_ENTITY) {
+				render_entity(entity);
+			}
+		}
+	}
+};
 
 class Sandbox : public Application {
 private:
@@ -14,6 +44,7 @@ private:
 	Entity monkey;
 
 	std::shared_ptr<InputManager> m_input_manager;
+	std::shared_ptr <EntityHierarchyRenderer> m_hierarchy_renderer;
 public:
 	void on_init() override {
 		m_input_manager = std::make_shared<InputManager>(*m_window);
@@ -31,8 +62,17 @@ public:
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
+		{
+			m_hierarchy_renderer = m_scene.m_ecs.register_system<EntityHierarchyRenderer>();
+			Signature sig;
+			sig.set(m_scene.m_ecs.get_component_type<Tag>());
+			sig.set(m_scene.m_ecs.get_component_type<Hierarchy>());
+			m_scene.m_ecs.set_system_signature<EntityHierarchyRenderer>(sig);
+		}
+
 		monkey = load_model(m_scene, "monkey.glb", "cel");
 		monkey.get_component<Transform>().translation.z = -2.0;
+		monkey.get_component<Tag>().name = "monkey";
 
 		m_scene.m_light_renderer->m_sun.direction = { 0.5, -1.0, -1.0 };
 	}
@@ -58,6 +98,7 @@ public:
 
 		GUI::begin_frame();
 			ImGui::Begin("hierarchy");
+				m_hierarchy_renderer->render();
 			ImGui::End();
 		GUI::end_frame();
 

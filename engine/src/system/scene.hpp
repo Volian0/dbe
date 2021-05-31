@@ -8,10 +8,11 @@ class HierarchySystem;
 
 class Scene {
 private:
-	ECS m_ecs;
 
 	friend class Entity;
 public:
+	ECS m_ecs;
+	
 	std::shared_ptr <Renderer> m_renderer;
 	std::shared_ptr <LightRenderer> m_light_renderer;
 	std::shared_ptr <HierarchySystem> m_hierarchy_system;
