@@ -18,7 +18,7 @@ public:
 
 	Scene();
 
-	Entity new_entity();
+	Entity new_entity(std::string name = "unnamed entity");
 
 	void update();
 	void render(const vec2& fb_size);
@@ -31,6 +31,8 @@ struct Entity {
 	Entity();
 	Entity(EntityHandle handle, Scene* scene);
 	Entity(const Entity& other) = default;
+
+	static const inline Entity null() { return Entity(NULL_ENTITY, nullptr); };
 
 	void destroy();
 	void destroy_children(EntityHandle parent);
@@ -67,15 +69,21 @@ struct Entity {
 	}
 };
 
-/* Responsible for updating entity parents and children */
+/* Component for dictating entity parent-child
+ * relationships. */
 struct Hierarchy {
 	EntityHandle self { NULL_ENTITY };
 	EntityHandle parent { NULL_ENTITY };
 	std::vector <EntityHandle> children;
 };
 
+/* Updates the transforms according to the hierarchy */
 class HierarchySystem : public System {
 private:
 public:
 	void update();
+};
+
+struct Tag {
+	std::string name;
 };

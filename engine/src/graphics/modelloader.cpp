@@ -14,7 +14,7 @@ void process_mesh(Scene& scene, Entity* parent, aiMesh* mesh, aiNode* node, cons
 	aiVector3D translation, rotation, scale;
 	node->mTransformation.Decompose(scale, rotation, translation);
 
-	Entity entity = scene.new_entity();
+	Entity entity = scene.new_entity(node->mName.C_Str());
 	entity.add_component<Transform>({
 		{translation.x, translation.y, translation.z},
 		{rotation.x, rotation.y, rotation.z},
@@ -152,7 +152,7 @@ void process_node(Scene& scene, Entity* parent, aiNode* node, const aiScene* mod
 		aiVector3D translation, rotation, scale;
 		node->mTransformation.Decompose(scale, rotation, translation);
 
-		Entity entity = scene.new_entity();
+		Entity entity = scene.new_entity(node->mName.C_Str());
 		entity.add_component<Transform>({
 			{translation.x, translation.y, translation.z},
 			{rotation.x, rotation.y, rotation.z},

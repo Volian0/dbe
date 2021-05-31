@@ -99,18 +99,23 @@ void Entity::unparent_from(Entity* parent) {
 	parent->remove_child(this);
 }
 
-Entity Scene::new_entity() {
-	return Entity(m_ecs.new_entity(), this);
+Entity Scene::new_entity(std::string name) {
+	Entity e = { m_ecs.new_entity(), this };
+
+	e.add_component<Tag>({name});
+
+	return e;
 }
 
 Scene::Scene() {
 	/* Register components */
-	m_ecs.register_component<Shader>();
-	m_ecs.register_component<Mesh>();
-	m_ecs.register_component<Transform>();
-	m_ecs.register_component<Sun>();
-	m_ecs.register_component<Material>();
 	m_ecs.register_component<Hierarchy>();
+	m_ecs.register_component<Material>();
+	m_ecs.register_component<Mesh>();
+	m_ecs.register_component<Shader>();
+	m_ecs.register_component<Sun>();
+	m_ecs.register_component<Tag>();
+	m_ecs.register_component<Transform>();
 
 	/* Register the renderer */
 	{
