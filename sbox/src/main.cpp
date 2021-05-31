@@ -97,7 +97,7 @@ public:
 		m_scene.render(vec2{(float)m_window->width, (float)m_window->height});
 
 		GUI::begin_frame();
-			ImGui::Begin("hierarchy");
+			ImGui::Begin(ICON_FK_TH_LIST " hierarchy");
 				m_hierarchy_renderer->render();
 			ImGui::End();
 		GUI::end_frame();

@@ -9,3 +9,4 @@
 #include "system/resources.hpp"
 #include "system/scene.hpp"
 #include "system/transform.hpp"
+#include "fonts/imguifontawesome.hpp"
