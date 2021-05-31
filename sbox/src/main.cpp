@@ -25,8 +25,7 @@ public:
 		m_scene.m_renderer->init("postprocess", "depth");
 
 		monkey = load_model(m_scene, "res/monkey.glb", "cel");
-		monkey.get_component<Transform>().translation.z = -3.0;
-		monkey.get_component<Transform>().rotation.y = 25.0;
+		monkey.get_component<Transform>().translation.z = -2.0;
 
 		m_scene.m_light_renderer->m_sun.direction = { 0.5, -1.0, -1.0 };
 	}
@@ -39,6 +38,10 @@ public:
 		{
 			return m_window->close();
 		}
+
+		monkey.get_component<Transform>().rotation.y += 25.0 * m_window->timestep;
+
+		m_scene.update();
 
 		m_scene.m_renderer->m_projection = mat4::persp(75.0,
 			(float)m_window->width/(float)m_window->height,

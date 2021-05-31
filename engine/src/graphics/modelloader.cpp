@@ -9,13 +9,16 @@
 
 std::string current_shader;
 
-void process_mesh(Scene& scene, Transform* parent, aiMesh* mesh, const aiScene* model) {
+void process_mesh(Scene& scene, Entity* parent, aiMesh* mesh, const aiScene* model) {
 	Entity entity = scene.new_entity();
 	entity.add_component<Transform>({
-			{0.0, 0.0, 0.0}, /* translation */
-			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}, /* scale */
-			parent});
+		{0.0, 0.0, 0.0}, /* translation */
+		{0.0, 0.0, 0.0}, /* rotation */
+		{1.0, 1.0, 1.0}, /* scale */
+	});
+	if (parent) {
+		entity.parent_to(parent);
+	}
 
 	bool has_uvs = false;
 
@@ -135,24 +138,15 @@ void process_mesh(Scene& scene, Transform* parent, aiMesh* mesh, const aiScene* 
 	});
 }
 
-Entity process_node(Scene& scene, Transform* parent, aiNode* node, const aiScene* model) {
-	Entity entity = scene.new_entity();
-	auto t = &entity.add_component<Transform>({
-			{0.0, 0.0, 0.0}, /* translation */
-			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}, /* scale */
-			parent});
-
+void process_node(Scene& scene, Entity* parent, aiNode* node, const aiScene* model) {
 	for (u32 i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = model->mMeshes[node->mMeshes[i]];
-		process_mesh(scene, t, mesh, model);
+		process_mesh(scene, parent, mesh, model);
 	}
 
 	for (u32 i = 0; i < node->mNumChildren; i++) {
-		process_node(scene, t, node->mChildren[i], model);
+		process_node(scene, parent, node->mChildren[i], model);
 	}
-
-	return entity;
 }
 
 Entity load_model(Scene& scene, const std::string& path, const std::string& shader) {
@@ -166,5 +160,13 @@ Entity load_model(Scene& scene, const std::string& path, const std::string& shad
 
 	current_shader = shader;
 
-	return process_node(scene, nullptr, model->mRootNode, model);
+	Entity entity = scene.new_entity();
+	entity.add_component<Transform>({
+		{0.0, 0.0, 0.0}, /* translation */
+		{0.0, 0.0, 0.0}, /* rotation */
+		{1.0, 1.0, 1.0}, /* scale */
+	});
+
+	process_node(scene, &entity, model->mRootNode, model);
+	return entity;
 }
