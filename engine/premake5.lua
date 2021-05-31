@@ -1,8 +1,9 @@
 engine_deps = {
-	"glfw",
+	"assimp",
 	"glad",
-	"physfs",
-	"assimp"
+	"glfw",
+	"imgui",
+	"physfs"
 }
 
 engine_system_deps_windows = {
@@ -34,7 +35,8 @@ project "engine"
 		"../extern/glfw/include",
 		"../extern/glad/include",
 		"../extern/physfs/src",
-		"../extern/assimp/include"
+		"../extern/assimp/include",
+		"../extern/imgui/include"
 	}
 
 	filter "configurations:debug"

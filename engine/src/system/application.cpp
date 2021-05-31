@@ -3,6 +3,7 @@
 #include "application.hpp"
 #include "resources.hpp"
 
+
 Application::~Application() {}
 
 void Application::run(const Config& config) {

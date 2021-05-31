@@ -2,10 +2,11 @@ workspace "dbe"
 	configurations { "debug", "release" }
 
 group "extern"
-include "extern/glfw"
-include "extern/glad"
-include "extern/physfs"
 include "extern/assimp"
+include "extern/glad"
+include "extern/glfw"
+include "extern/imgui"
+include "extern/physfs"
 
 group "projects"
 include "engine"

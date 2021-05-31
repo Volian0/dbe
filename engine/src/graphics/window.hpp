@@ -10,6 +10,7 @@
 class Window
 {
 	friend class InputManager;
+	friend class GUI;
 
 public:
 	double timestep { 0.0 };

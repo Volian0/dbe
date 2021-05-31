@@ -18,6 +18,7 @@ project "sbox"
 		"../extern/glad/include",
 		"../extern/physfs/src",
 		"../extern/assimp/include",
+		"../extern/imgui/include",
 		"../engine/src"
 	}
 

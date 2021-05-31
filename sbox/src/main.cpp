@@ -1,4 +1,9 @@
 #include <engine.hpp>
+#include <imgui.h>
+
+static void draw_entity_hierarchy(Entity entity) {
+
+}
 
 class Sandbox : public Application {
 private:
@@ -13,6 +18,8 @@ public:
 	void on_init() override {
 		m_input_manager = std::make_shared<InputManager>(*m_window);
 
+		GUI::init(m_window);
+
 		m_scene.m_renderer->new_shader("postprocess",
 			ResourceManager::load_string("shaders/postprocess.glsl"));
 
@@ -24,7 +31,7 @@ public:
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
-		monkey = load_model(m_scene, "thing.glb", "cel");
+		monkey = load_model(m_scene, "monkey.glb", "cel");
 		monkey.get_component<Transform>().translation.z = -2.0;
 
 		m_scene.m_light_renderer->m_sun.direction = { 0.5, -1.0, -1.0 };
@@ -49,6 +56,11 @@ public:
 
 		m_scene.render(vec2{(float)m_window->width, (float)m_window->height});
 
+		GUI::begin_frame();
+			ImGui::Begin("hierarchy");
+			ImGui::End();
+		GUI::end_frame();
+
 		m_next_reload -= m_window->timestep;
 		if (m_next_reload <= 0.0) {
 			m_next_reload = 1.0;
@@ -57,14 +69,14 @@ public:
 	}
 
 	void on_destroy() override {
-
+		GUI::quit();
 	}
 };
 
 int main() {
 	Sandbox sbox;
 	sbox.run({
-		640, 480,
+		1366, 768,
 		"Sandbox",
 		false
 	});
