@@ -10,12 +10,15 @@
 
 std::string current_shader;
 
-void process_mesh(Scene& scene, Entity* parent, aiMesh* mesh, const aiScene* model) {
+void process_mesh(Scene& scene, Entity* parent, aiMesh* mesh, aiNode* node, const aiScene* model) {
+	aiVector3D translation, rotation, scale;
+	node->mTransformation.Decompose(scale, rotation, translation);
+
 	Entity entity = scene.new_entity();
 	entity.add_component<Transform>({
-		{0.0, 0.0, 0.0}, /* translation */
-		{0.0, 0.0, 0.0}, /* rotation */
-		{1.0, 1.0, 1.0}, /* scale */
+		{translation.x, translation.y, translation.z},
+		{rotation.x, rotation.y, rotation.z},
+		{scale.x, scale.y, scale.z},
 	});
 	if (parent) {
 		entity.parent_to(parent);
@@ -142,18 +145,22 @@ void process_mesh(Scene& scene, Entity* parent, aiMesh* mesh, const aiScene* mod
 void process_node(Scene& scene, Entity* parent, aiNode* node, const aiScene* model) {
 	for (u32 i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = model->mMeshes[node->mMeshes[i]];
-		process_mesh(scene, parent, mesh, model);
+		process_mesh(scene, parent, mesh, node, model);
 	}
 
 	for (u32 i = 0; i < node->mNumChildren; i++) {
+		aiVector3D translation, rotation, scale;
+		node->mTransformation.Decompose(scale, rotation, translation);
+
 		Entity entity = scene.new_entity();
 		entity.add_component<Transform>({
-			{0.0, 0.0, 0.0}, /* translation */
-			{0.0, 0.0, 0.0}, /* rotation */
-			{1.0, 1.0, 1.0}, /* scale */
+			{translation.x, translation.y, translation.z},
+			{rotation.x, rotation.y, rotation.z},
+			{scale.x, scale.y, scale.z},
 		});
-
-		entity.parent_to(parent);
+		if (parent) {
+			entity.parent_to(parent);
+		}
 
 		process_node(scene, &entity, node->mChildren[i], model);
 	}
