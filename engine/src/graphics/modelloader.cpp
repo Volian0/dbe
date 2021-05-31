@@ -88,13 +88,49 @@ void process_mesh(Scene& scene, Transform* parent, aiMesh* mesh, const aiScene* 
 		};
 	}
 
+	vec3 lit_color = {0.788, 0.176, 0.133};
+	vec3 unlit_color = {0.388, 0.141, 0.121};
+	vec3 specular_color = {0.886, 0.557, 0.533};
+
+	if (mesh->mMaterialIndex >= 0) {
+		aiMaterial* material = model->mMaterials[mesh->mMaterialIndex];
+
+		aiColor3D color_diffuse;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, color_diffuse);
+		lit_color = vec3(
+			color_diffuse.r,
+			color_diffuse.g,
+			color_diffuse.b
+		);
+
+		unlit_color = vec3(
+			color_diffuse.r - 0.3,
+			color_diffuse.g - 0.3,
+			color_diffuse.b - 0.3
+		);
+
+		if (unlit_color.x <= 0.0) { unlit_color.x = 0.0; }
+		if (unlit_color.y <= 0.0) { unlit_color.y = 0.0; }
+		if (unlit_color.z <= 0.0) { unlit_color.z = 0.0; }
+
+		specular_color = vec3(
+			color_diffuse.r + 0.3,
+			color_diffuse.g + 0.3,
+			color_diffuse.b + 0.3
+		);
+
+		if (unlit_color.x >= 1.0) { unlit_color.x = 1.0; }
+		if (unlit_color.y >= 1.0) { unlit_color.y = 1.0; }
+		if (unlit_color.z >= 1.0) { unlit_color.z = 1.0; }
+	}
+
 	entity.add_component<Shader>(scene.m_renderer->get_shader(current_shader));
 	entity.add_component<Mesh>(scene.m_renderer->new_mesh(
 		mesh->mName.C_Str(), Mesh::Flags::DRAW_TRIANGLES, vertices, indices, mlc));
 	entity.add_component<Material>({
-		{0.788, 0.176, 0.133}, /* lit color */
-		{0.388, 0.141, 0.121}, /* unlit color */
-		{0.886, 0.557, 0.533}, /* specular color */
+		lit_color, /* lit color */
+		unlit_color, /* unlit color */
+		specular_color, /* specular color */
 		0.9, /* specular_cutoff */
 	});
 }
