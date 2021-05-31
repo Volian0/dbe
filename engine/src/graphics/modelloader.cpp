@@ -6,6 +6,7 @@
 #include "int.hpp"
 #include "logger.hpp"
 #include "system/transform.hpp"
+#include "system/resources.hpp"
 
 std::string current_shader;
 
@@ -150,8 +151,13 @@ void process_node(Scene& scene, Entity* parent, aiNode* node, const aiScene* mod
 }
 
 Entity load_model(Scene& scene, const std::string& path, const std::string& shader) {
+	auto resource = ResourceManager::load_binary(path);
+
 	Assimp::Importer import;
-	const aiScene* model = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* model =
+		import.ReadFileFromMemory(resource->data, resource->size,
+			aiProcess_Triangulate | aiProcess_FlipUVs,
+			ResourceManager::get_file_extension(path).c_str());
 
 	if (!model || model->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !model->mRootNode) {
 		log(LOG_ERROR, "Error loading model: %s", import.GetErrorString());

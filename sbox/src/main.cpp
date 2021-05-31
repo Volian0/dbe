@@ -24,7 +24,7 @@ public:
 
 		m_scene.m_renderer->init("postprocess", "depth");
 
-		monkey = load_model(m_scene, "res/monkey.glb", "cel");
+		monkey = load_model(m_scene, "monkey.glb", "cel");
 		monkey.get_component<Transform>().translation.z = -2.0;
 
 		m_scene.m_light_renderer->m_sun.direction = { 0.5, -1.0, -1.0 };
