@@ -14,7 +14,7 @@
 #include "depthbuffer.hpp"
 
 struct Shader {
-	u32 id;
+	std::string name;
 };
 
 struct Mesh {
@@ -49,12 +49,12 @@ struct MeshLayoutConfig {
 
 class Renderer : public System {
 private:
-	std::map <std::string, Shader> m_shaders;
+	std::map <std::string, u32> m_shaders;
 	std::map <std::string, Mesh> m_meshes;
 
-	Shader m_postprocess;
-	Shader m_depth;
-	
+	u32 m_postprocess;
+	u32 m_depth;
+
 	Mesh m_fullscreen_quad;
 
 	std::shared_ptr <RenderTarget> m_rendertarget;
@@ -66,16 +66,16 @@ public:
 
 	void render(const vec2& fb_size);
 
-	Shader new_shader(const std::string& name, const std::string& source);
-	Shader get_shader(const std::string& name);
-	void delete_shader(const Shader& shader);
-	void bind_shader(const Shader& shader) const;
-	void set_shader_uniform_int(const Shader& shader, const std::string& name, i32 val) const;
-	void set_shader_uniform_float(const Shader& shader, const std::string& name, float val) const;
-	void set_shader_uniform_vec2(const Shader& shader, const std::string& name, const vec2& val) const;
-	void set_shader_uniform_vec3(const Shader& shader, const std::string& name, const vec3& val) const;
-	void set_shader_uniform_vec4(const Shader& shader, const std::string& name, const vec4& val) const;
-	void set_shader_uniform_mat4(const Shader& shader, const std::string& name, const mat4& val) const;
+	u32 new_shader(const std::string& name, const std::string& source);
+	u32 get_shader(const std::string& name);
+	void delete_shader(u32 shader);
+	void bind_shader(u32 shader) const;
+	void set_shader_uniform_int(u32 shader, const std::string& name, i32 val) const;
+	void set_shader_uniform_float(u32 shader, const std::string& name, float val) const;
+	void set_shader_uniform_vec2(u32 shader, const std::string& name, const vec2& val) const;
+	void set_shader_uniform_vec3(u32 shader, const std::string& name, const vec3& val) const;
+	void set_shader_uniform_vec4(u32 shader, const std::string& name, const vec4& val) const;
+	void set_shader_uniform_mat4(u32 shader, const std::string& name, const mat4& val) const;
 
 	Mesh new_mesh(const std::string& name, const Mesh::Flags& flags,
 		const std::vector <float>& vertices, const std::vector <u32>& indices,

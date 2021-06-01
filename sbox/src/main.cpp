@@ -1,7 +1,6 @@
 #include <engine.hpp>
 #include <imgui.h>
 
-
 class EntityHierarchyRenderer : public System {
 private:
 public:

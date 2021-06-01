@@ -131,7 +131,7 @@ void process_mesh(Scene& scene, Entity* parent, aiMesh* mesh, aiNode* node, cons
 		if (unlit_color.z >= 1.0) { unlit_color.z = 1.0; }
 	}
 
-	entity.add_component<Shader>(scene.m_renderer->get_shader(current_shader));
+	entity.add_component<Shader>({current_shader});
 	entity.add_component<Mesh>(scene.m_renderer->new_mesh(
 		mesh->mName.C_Str(), Mesh::Flags::DRAW_TRIANGLES, vertices, indices, mlc));
 	entity.add_component<Material>({
