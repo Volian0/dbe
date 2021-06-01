@@ -64,7 +64,7 @@ public:
 
 	void init(const std::string& postprocess_shader, const std::string& depth_shader);
 
-	void render(const vec2& fb_size);
+	void render(const vec2& fb_size, RenderTarget* fb = nullptr);
 
 	u32 new_shader(const std::string& name, const std::string& source);
 	u32 get_shader(const std::string& name);

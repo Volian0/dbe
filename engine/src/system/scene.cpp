@@ -152,9 +152,9 @@ void Scene::update() {
 	m_hierarchy_system->update();
 }
 
-void Scene::render(const vec2& fb_size) {
+void Scene::render(const vec2& fb_size, RenderTarget* fb) {
 	m_light_renderer->render();
-	m_renderer->render(fb_size);
+	m_renderer->render(fb_size, fb);
 }
 
 void HierarchySystem::update() {

@@ -52,8 +52,13 @@ void Renderer::init(const std::string& postprocess_shader, const std::string& de
 	);
 }
 
-void Renderer::render(const vec2& fb_size) {
+void Renderer::render(const vec2& fb_size, RenderTarget* fb) {
 	glClearColor(0.9, 0.9, 1.0, 1.0);
+
+	vec2 size = fb_size;
+	if (fb) {
+		size = fb->get_size();
+	}
 
 	m_depth_buffer->resize(fb_size);
 	m_depth_buffer->bind();
@@ -95,6 +100,11 @@ void Renderer::render(const vec2& fb_size) {
 	}
 
 	m_rendertarget->unbind(fb_size);
+
+	if (fb) {
+		fb->bind();
+	}
+
 	m_rendertarget->bind_output(0);
 	m_depth_buffer->bind_output(1);
 
@@ -106,6 +116,10 @@ void Renderer::render(const vec2& fb_size) {
 	draw_mesh(m_fullscreen_quad);
 
 	glBindVertexArray(0);
+
+	if (fb) {
+		fb->unbind(fb_size);
+	}
 }
 
 void LightRenderer::init(Renderer* renderer) {

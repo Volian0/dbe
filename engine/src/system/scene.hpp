@@ -12,7 +12,7 @@ private:
 	friend class Entity;
 public:
 	ECS m_ecs;
-	
+
 	std::shared_ptr <Renderer> m_renderer;
 	std::shared_ptr <LightRenderer> m_light_renderer;
 	std::shared_ptr <HierarchySystem> m_hierarchy_system;
@@ -22,7 +22,7 @@ public:
 	Entity new_entity(std::string name = "unnamed entity");
 
 	void update();
-	void render(const vec2& fb_size);
+	void render(const vec2& fb_size, RenderTarget* fb);
 };
 
 struct Entity {

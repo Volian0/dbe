@@ -14,7 +14,7 @@ public:
 			flags |= ImGuiTreeNodeFlags_Leaf;
 		}
 
-		if (ImGui::TreeNodeEx((void*)(u32)entity, flags, "%s", tag.name.c_str())) {
+		if (ImGui::TreeNodeEx((void*)(u64)entity, flags, "%s", tag.name.c_str())) {
 			for (const auto& child : hierarchy.children) {
 				render_entity(child);
 			}
@@ -44,9 +44,13 @@ private:
 
 	std::shared_ptr<InputManager> m_input_manager;
 	std::shared_ptr <EntityHierarchyRenderer> m_hierarchy_renderer;
+
+	std::shared_ptr <RenderTarget> m_scene_fb;
 public:
 	void on_init() override {
 		m_input_manager = std::make_shared<InputManager>(*m_window);
+
+		m_scene_fb = std::make_shared<RenderTarget>(vec2(1024, 768));
 
 		GUI::init(m_window);
 
@@ -89,15 +93,34 @@ public:
 
 		m_scene.update();
 
-		m_scene.m_renderer->m_projection = mat4::persp(75.0,
-			(float)m_window->width/(float)m_window->height,
-			0.1, 100.0);
-
-		m_scene.render(vec2{(float)m_window->width, (float)m_window->height});
+		m_scene.render(vec2{(float)m_window->width, (float)m_window->height},
+			m_scene_fb.get());
 
 		GUI::begin_frame();
 			ImGui::Begin(ICON_FK_TH_LIST " hierarchy");
 				m_hierarchy_renderer->render();
+			ImGui::End();
+
+			ImGui::Begin(ICON_FK_TH_LIST " resource manager");
+			ImGui::End();
+
+			ImGui::Begin("scene");
+				ImVec2 window_size = ImGui::GetWindowSize();
+				window_size.x -= 20;
+				window_size.y -= 40;
+
+				m_scene_fb->resize(vec2(window_size.x, window_size.y));
+
+				m_scene.m_renderer->m_projection = mat4::persp(75.0,
+					(float)window_size.x/(float)window_size.y,
+					0.1, 100.0);
+
+				ImVec2 uv_min = ImVec2(0.0f, 0.0f);
+				ImVec2 uv_max = ImVec2(1.0f, -1.0f);
+
+				ImGui::Image((void*)(u64)m_scene_fb->get_output(),
+					ImVec2(m_scene_fb->get_size().x, m_scene_fb->get_size().y),
+					uv_min, uv_max);
 			ImGui::End();
 		GUI::end_frame();
 
@@ -116,7 +139,7 @@ public:
 int main() {
 	Sandbox sbox;
 	sbox.run({
-		1366, 768,
+		1024, 768,
 		"Sandbox",
 		false
 	});
