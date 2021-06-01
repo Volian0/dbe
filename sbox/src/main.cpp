@@ -1,5 +1,22 @@
 #include <engine.hpp>
 #include <imgui.h>
+#include <imgui_internal.h>
+
+static std::vector<std::string> split(const std::string& str, const std::string& delim)
+{
+    std::vector<std::string> tokens;
+    size_t prev = 0, pos = 0;
+    do
+    {
+        pos = str.find(delim, prev);
+        if (pos == std::string::npos) pos = str.length();
+        std::string token = str.substr(prev, pos-prev);
+        if (!token.empty()) tokens.push_back(token);
+        prev = pos + delim.length();
+    }
+    while (pos < str.length() && prev < str.length());
+    return tokens;
+}
 
 class EntityHierarchyRenderer : public System {
 private:
@@ -46,6 +63,9 @@ private:
 	std::shared_ptr <EntityHierarchyRenderer> m_hierarchy_renderer;
 
 	std::shared_ptr <RenderTarget> m_scene_fb;
+
+	std::string m_current_display_dir;
+	std::string m_selected_file;
 public:
 	void on_init() override {
 		m_input_manager = std::make_shared<InputManager>(*m_window);
@@ -101,10 +121,114 @@ public:
 				m_hierarchy_renderer->render();
 			ImGui::End();
 
-			ImGui::Begin(ICON_FK_TH_LIST " resource manager");
+			ImGui::Begin(ICON_FK_COG " properties");
+				if (m_selected_file.size() != 0 &&
+					ResourceManager::get_file_extension(m_selected_file) == "glsl" ||
+					ResourceManager::get_file_extension(m_selected_file) == "txt" ||
+					ResourceManager::get_file_extension(m_selected_file) == "cpp" ||
+					ResourceManager::get_file_extension(m_selected_file) == "hpp" ||
+					ResourceManager::get_file_extension(m_selected_file) == "h" ||
+					ResourceManager::get_file_extension(m_selected_file) == "c" ||
+					ResourceManager::get_file_extension(m_selected_file) == "md") {
+					std::string path = m_current_display_dir + m_selected_file;
+					ImGui::Text("File preview: res/%s", path.c_str());
+
+					ImGui::BeginChild("preview",
+						ImVec2(ImGui::GetWindowContentRegionWidth(), 300));
+					ImGui::TextWrapped("%s", ResourceManager::load_string(path).c_str());
+					ImGui::EndChild();
+				}
 			ImGui::End();
 
-			ImGui::Begin("scene");
+			ImGui::Begin(ICON_FK_TH_LIST " resource manager");
+				if (ImGui::Button("res")) {
+					m_current_display_dir = "";
+				}
+				ImGui::SameLine();
+				ImGui::Text("/");
+
+				auto path = split(m_current_display_dir, "/");
+				std::string uptil;
+				for (const auto& section : path) {
+					ImGui::SameLine();
+
+					uptil += section + "/";
+
+					if (ImGui::Button(section.c_str())) {
+						m_current_display_dir = uptil;
+					}
+
+					ImGui::SameLine();
+					ImGui::Text("/");
+				}
+
+				ImGui::Separator();
+
+				auto dir_list = ResourceManager::get_dir(m_current_display_dir);
+
+				for (const auto& entry : dir_list) {
+					auto name = entry.name;
+
+					auto i = name.find_last_of('/');
+					std::string end;
+					if (i != std::string::npos) {
+						end = name.substr(i + 1);
+					}
+					name = end;
+
+					const char* icon = entry.is_directory ? ICON_FK_FOLDER : ICON_FK_FILE;
+
+					ImGui::BeginGroup();
+						ImVec4 color = { 1.0, 1.0, 1.0, 1.0};
+						if (m_selected_file == name) {
+							color = ImVec4(0.391f, 0.391f, 1.000f, 0.781f);
+						}
+
+						ImGui::PushStyleColor(ImGuiCol_Text, color);
+
+						ImVec2 text_size = ImGui::CalcTextSize(name.c_str());
+						ImVec2 icon_size = ImGui::CalcTextSize(icon);
+
+						float width = std::max(text_size.x, 65.0f);
+
+						ImVec2 before_button = ImGui::GetCursorPos();
+						if (ImGui::Button(std::string("##" + name).c_str(),
+							ImVec2(width, ((text_size.y + icon_size.y) * 2) + 7)) &&
+							!entry.is_directory) {
+							m_selected_file = name;
+						}
+
+						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)
+							&& entry.is_directory) {
+							m_current_display_dir += name + "/";
+						}
+
+						ImGui::SetCursorPos(before_button);
+
+						ImGui::SetCursorPosX(
+							(ImGui::GetCursorPosX() + (text_size.x / 2))
+							- (icon_size.x / 2) - 12);
+
+						GUI::use_big_icons();
+						ImGui::Text(icon);
+						GUI::use_small_icons();
+
+						ImGui::Text("%s", name.c_str());
+
+						ImGui::PopStyleColor();
+					ImGui::EndGroup();
+
+					ImGui::SameLine();
+				}
+
+				if (!ImGui::IsAnyItemHovered() && ImGui::IsWindowHovered() &&
+					ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+					m_selected_file = "";
+				}
+
+			ImGui::End();
+
+			ImGui::Begin(ICON_FK_CUBE " scene");
 				ImVec2 window_size = ImGui::GetWindowSize();
 				window_size.x -= 20;
 				window_size.y -= 40;

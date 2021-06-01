@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "int.hpp"
 
@@ -25,6 +26,12 @@ struct Resource {
 	~Resource();
 };
 
+struct FileEntry {
+	std::string name;
+	std::string extension;
+	bool is_directory;
+};
+
 class ResourceManager {
 private:
 	static inline ResourceManager& instance() {
@@ -43,6 +50,9 @@ public:
 	static void hot_reload();
 
 	static std::string get_file_extension(const std::string& name);
+
+	static std::vector<FileEntry> get_dir(const std::string& dir);
+	static std::vector<FileEntry> get_dir_r(const std::string& dir);
 
 	static const std::shared_ptr <Resource>& load_text(const std::string& name, bool reload = false);
 	static const std::shared_ptr <Resource>& load_binary(const std::string& name, bool reload = false);

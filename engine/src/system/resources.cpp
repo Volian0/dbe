@@ -68,6 +68,57 @@ std::string ResourceManager::get_file_extension(const std::string& name) {
 	return ext;
 }
 
+std::vector<FileEntry> ResourceManager::get_dir_r(const std::string& dir) {
+	std::vector<FileEntry> result;
+
+	char **rc = PHYSFS_enumerateFiles(dir.c_str());
+	char **i;
+	for (i = rc; *i != NULL; i++) {
+		PHYSFS_Stat stat;
+		std::string fname = dir + "/" + *i;
+		PHYSFS_stat(fname.c_str(), &stat);
+
+		FileEntry current_entry;
+
+		if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
+			auto a = result;
+			auto b = get_dir(fname);
+			a.insert(a.end(), b.begin(), b.end());
+			result = a;
+		} else {
+			current_entry.name = fname;
+			current_entry.extension = get_file_extension(fname);
+			result.push_back(current_entry);
+		}
+
+	}
+	PHYSFS_freeList(rc);
+
+	return result;
+}
+
+std::vector<FileEntry> ResourceManager::get_dir(const std::string& dir) {
+	std::vector<FileEntry> result;
+
+	char **rc = PHYSFS_enumerateFiles(dir.c_str());
+	char **i;
+	for (i = rc; *i != NULL; i++) {
+		PHYSFS_Stat stat;
+		std::string fname = dir + "/" + *i;
+		PHYSFS_stat(fname.c_str(), &stat);
+
+		FileEntry current_entry;
+
+		current_entry.name = fname;
+		current_entry.extension = get_file_extension(fname);
+		current_entry.is_directory = (stat.filetype == PHYSFS_FILETYPE_DIRECTORY);
+		result.push_back(current_entry);
+	}
+	PHYSFS_freeList(rc);
+
+	return result;
+}
+
 const std::shared_ptr <Resource>& ResourceManager::load_text(const std::string& name, bool reload) {
 	auto& i = instance();
 

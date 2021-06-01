@@ -25,8 +25,10 @@ void GUI::init(const std::shared_ptr <Window>& window) {
 	ImFontConfig config;
 	config.MergeMode = true;
 	static const ImWchar icon_ranges[] = { ICON_MIN_FK, ICON_MAX_FK, 0 };
-	io.Fonts->AddFontFromMemoryCompressedTTF(FontAwesome4_compressed_data,
+	instance().small_icons = io.Fonts->AddFontFromMemoryCompressedTTF(FontAwesome4_compressed_data,
 		FontAwesome4_compressed_size, 14.0f, &config, icon_ranges);
+	instance().big_icons = io.Fonts->AddFontFromMemoryCompressedTTF(FontAwesome4_compressed_data,
+		FontAwesome4_compressed_size, 42.0f, nullptr, icon_ranges);
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
@@ -118,4 +120,12 @@ void GUI::end_frame() {
 		ImGui::RenderPlatformWindowsDefault();
 		glfwMakeContextCurrent(backup_current_context);
 	}
+}
+
+void GUI::use_big_icons() {
+	ImGui::PushFont(instance().big_icons);
+}
+
+void GUI::use_small_icons() {
+	ImGui::PopFont();
 }
