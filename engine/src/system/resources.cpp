@@ -161,7 +161,16 @@ void ResourceManager::hot_reload() {
 		PHYSFS_stat(f.first.c_str(), &stat);
 
 		if (stat.modtime > f.second->modtime) {
-			load_text(f.first, true);
+			switch (f.second->type) {
+			case Resource::TEXT:
+				load_text(f.first, true);
+				break;
+			case Resource::BINARY:
+				load_binary(f.first, true);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }
