@@ -21,7 +21,7 @@ public:
 
 	Entity new_entity(std::string name = "unnamed entity");
 
-	void update();
+	void update(double timestep);
 	void render(const vec2& fb_size, RenderTarget* fb);
 };
 

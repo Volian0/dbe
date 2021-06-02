@@ -148,7 +148,7 @@ Scene::Scene() {
 	}
 }
 
-void Scene::update() {
+void Scene::update(double timestep) {
 	m_hierarchy_system->update();
 }
 

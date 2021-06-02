@@ -2,20 +2,18 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-static std::vector<std::string> split(const std::string& str, const std::string& delim)
-{
-    std::vector<std::string> tokens;
-    size_t prev = 0, pos = 0;
-    do
-    {
-        pos = str.find(delim, prev);
-        if (pos == std::string::npos) pos = str.length();
-        std::string token = str.substr(prev, pos-prev);
-        if (!token.empty()) tokens.push_back(token);
-        prev = pos + delim.length();
-    }
-    while (pos < str.length() && prev < str.length());
-    return tokens;
+static std::vector<std::string> split(const std::string& str, const std::string& delim) {
+	std::vector<std::string> tokens;
+	size_t prev = 0, pos = 0;
+	do {
+		pos = str.find(delim, prev);
+		if (pos == std::string::npos) pos = str.length();
+		std::string token = str.substr(prev, pos-prev);
+		if (!token.empty()) tokens.push_back(token);
+		prev = pos + delim.length();
+	}
+	while (pos < str.length() && prev < str.length());
+	return tokens;
 }
 
 class EntityHierarchyRenderer : public System {
@@ -97,6 +95,21 @@ public:
 		monkey.get_component<Transform>().translation.z = -2.0;
 		monkey.get_component<Tag>().name = "monkey";
 
+		Entity ground = m_scene.new_entity();
+		monkey.get_component<Tag>().name = "cube";
+		ground.add_component<Transform>({
+			vec3(0.0, -2.0, 0.0),
+			vec3(0.0),
+			vec3(10.0, 0.1, 10.0)});
+		ground.add_component<Shader>({"cel"});
+		ground.add_component<Mesh>(m_scene.m_renderer->new_cube_mesh("cube", Mesh::Flags::DRAW_TRIANGLES));
+		ground.add_component<Material>({
+			vec3(0.9, 0.9, 0.9), /* lit color */
+			vec3(0.7, 0.7, 0.7), /* unlit color */
+			vec3(1.0, 1.0, 1.0), /* specular color */
+			0.9, /* specular_cutoff */
+		});
+
 		m_scene.m_light_renderer->m_sun.direction = { 0.5, -1.0, -1.0 };
 	}
 
@@ -109,9 +122,7 @@ public:
 			return m_window->close();
 		}
 
-		monkey.get_component<Transform>().rotation.y += 25.0 * m_window->timestep;
-
-		m_scene.update();
+		m_scene.update(m_window->timestep);
 
 		m_scene.render(vec2{(float)m_window->width, (float)m_window->height},
 			m_scene_fb.get());
@@ -138,6 +149,18 @@ public:
 					ImGui::TextWrapped("%s", ResourceManager::load_string(path).c_str());
 					ImGui::EndChild();
 				}
+			ImGui::End();
+
+			ImGui::Begin("scene properties");
+	
+				auto& dir_ref = m_scene.m_light_renderer->m_sun.direction;
+
+				float dir[3] = { dir_ref.x, dir_ref.y, dir_ref.z };
+
+				ImGui::DragFloat3("sun direction", dir, 0.01, -1.0, 1.0);
+
+				dir_ref = vec3(dir[0], dir[1], dir[2]);
+
 			ImGui::End();
 
 			ImGui::Begin(ICON_FK_TH_LIST " resource manager");
